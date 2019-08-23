@@ -1,0 +1,10 @@
+name: 'Node 12 Template Action'
+description: 'Get started with Node actions'
+author: 'GitHub'
+inputs:
+  myInput:
+    description: 'Input to use'
+    default: 'world'
+runs:
+  using: 'node12'
+  main: 'lib/main.js'

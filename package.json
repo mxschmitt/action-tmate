@@ -1,0 +1,33 @@
+{
+  "name": "node12-template-action",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Node 12 template action",
+  "main": "lib/main.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/actions/node12-template.git"
+  },
+  "keywords": [
+    "actions",
+    "node",
+    "setup"
+  ],
+  "author": "GitHub",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.13",
+    "@types/node": "^12.0.4",
+    "jest": "^24.8.0",
+    "jest-circus": "^24.7.1",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.5.1"
+  }
+}
