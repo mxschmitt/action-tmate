@@ -1,10 +1,6 @@
-name: 'Node 12 Template Action'
-description: 'Get started with Node actions'
-author: 'GitHub'
-inputs:
-  myInput:
-    description: 'Input to use'
-    default: 'world'
+name: 'Debugging with tmate'
+description: 'Debug your GitHub Actions Environment'
+author: 'Max Schmitt'
 runs:
   using: 'node12'
   main: 'lib/main.js'
