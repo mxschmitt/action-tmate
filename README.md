@@ -1,9 +1,23 @@
-# JavaScript Action Template
+# Debug your GitHub Actions by using tmate
 
-This template offers an easy way to get started writing a javascript action with TypeScript compile time support, unit testing with Jest and using the GitHub Actions Toolkit.
+This GitHub Action offers you a direct way to interact with the host system on which the actual scripts (Actions) will run.
 
 ## Getting Started
 
-See the walkthrough located [here](https://github.com/actions/toolkit/blob/master/docs/javascript-action.md).
+By using this minimal example a [tmate](https://tmate.io) session will be created.
 
-In addition to walking your through how to create an action, it also provides strategies for versioning, releasing and referencing your actions.
+```
+name: CI
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v1
+```
+
+To get the connection string, just open the `Checks` tab and scroll to the bottom. There you can connect either directly per SSH or via a web based interface.
+
+![alt text](./docs/checks-tab.png "Logo Title Text 1")
