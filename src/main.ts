@@ -29,9 +29,8 @@ function execShellCommand(cmd: string): Promise<string> {
 async function run() {
   try {
     core.debug("Installing dependencies")
-    await execShellCommand('sudo apt-get install -y locales tmate openssh-client');
+    await execShellCommand('sudo apt-get install -y tmate openssh-client');
     core.debug("Installed dependencies successfully");
-    await execShellCommand('locale-gen en_US.UTF-8');
     try {
       await execShellCommand(`echo -e 'y\n'|ssh-keygen -q -t rsa -N "" -f ~/.ssh/id_rsa`);
     } catch { }
