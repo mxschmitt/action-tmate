@@ -4,3 +4,5 @@ author: 'Max Schmitt'
 runs:
   using: 'node12'
   main: 'lib/main.js'
+icon: settings
+color: gray-dark
