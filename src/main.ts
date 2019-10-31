@@ -30,7 +30,7 @@ async function run() {
   try {
     core.debug("Installing dependencies")
     if (process.platform === 'darwin') {
-      await execShellCommand('sudo brew install tmate');
+      await execShellCommand('brew install tmate');
     } else {
       await execShellCommand('sudo apt-get install -y tmate openssh-client');
     }
