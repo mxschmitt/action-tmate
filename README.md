@@ -2,6 +2,11 @@
 
 This GitHub Action offers you a direct way to interact with the host system on which the actual scripts (Actions) will run.
 
+## Supported Operating Systems
+
+- `Linux`
+- `macOS`
+
 ## Getting Started
 
 By using this minimal example a [tmate](https://tmate.io) session will be created.
