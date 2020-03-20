@@ -1,3 +1,3 @@
-const { run } = require(".")
+import { run } from "./index"
 
 run()

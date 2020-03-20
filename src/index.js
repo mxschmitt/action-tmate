@@ -1,15 +1,11 @@
-const { promisify } = require("util")
-const fs = require("fs")
+import fs from "fs"
+import * as core from "@actions/core"
 
-const fsExists = promisify(fs.exists)
-
-const core = require("@actions/core")
-
-const { execShellCommand } = require("./helpers")
+import { execShellCommand } from "./helpers"
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-async function run() {
+export async function run() {
   try {
     if (process.platform === "win32") {
       core.info("Windows is not supported by tmate, skipping...")
@@ -42,12 +38,12 @@ async function run() {
 
     console.debug("Entering main loop")
     while (true) {
-      core.debug(`WebURL: ${tmateWeb}`);
-      core.debug(`SSH: ${tmateSSH}`);
+      core.info(`WebURL: ${tmateWeb}`);
+      core.info(`SSH: ${tmateSSH}`);
 
-      const skip = await fsExists("/continue")
+      const skip = fs.existsSync("/continue")
       if (skip) {
-        core.info("Existing debugging session")
+        core.info("Existing debugging session because '/continue' file was created")
         break
       }
       await sleep(5000)
@@ -55,8 +51,4 @@ async function run() {
   } catch (error) {
     core.setFailed(error.message);
   }
-}
-
-module.exports = {
-  run
 }

@@ -1,11 +1,12 @@
 jest.mock('@actions/core');
-const core = require("@actions/core")
+import * as core from "@actions/core"
 
+jest.mock("fs", () => ({
+  existsSync: () => true
+}));
 jest.mock('./helpers');
-jest.mock("fs");
-const fs = require("fs")
-const { execShellCommand } = require("./helpers")
-const { run } = require(".")
+import { execShellCommand } from "./helpers"
+import { run } from "."
 
 describe('Tmate GitHub integration', () => {
   const originalPlatform = process.platform;
@@ -27,20 +28,18 @@ describe('Tmate GitHub integration', () => {
     Object.defineProperty(process, "platform", {
       value: "linux"
     })
-    fs.existsSync.mockReturnValue(false);
     const customConnectionString = "foobar"
     execShellCommand.mockReturnValue(Promise.resolve(customConnectionString))
     await run()
     expect(execShellCommand).toHaveBeenNthCalledWith(1, "sudo apt-get update")
-    expect(core.info).toHaveBeenCalledWith('Existing debugging session');
-    expect(core.debug).toHaveBeenNthCalledWith(7, `WebURL: ${customConnectionString}`);
-    expect(core.debug).toHaveBeenNthCalledWith(8, `SSH: ${customConnectionString}`);
+    expect(core.info).toHaveBeenNthCalledWith(1, `WebURL: ${customConnectionString}`);
+    expect(core.info).toHaveBeenNthCalledWith(2, `SSH: ${customConnectionString}`);
+    expect(core.info).toHaveBeenNthCalledWith(3, "Existing debugging session because '/continue' file was created");
   });
   it('should install tmate via brew for darwin', async () => {
     Object.defineProperty(process, "platform", {
       value: "darwin"
     })
-    fs.existsSync.mockReturnValue(false);
     await run()
     expect(execShellCommand).toHaveBeenNthCalledWith(1, "brew install tmate")
   });
