@@ -3,4 +3,4 @@ description: 'Debug your GitHub Actions Environment'
 author: 'Max Schmitt'
 runs:
   using: 'node12'
-  main: 'src/main.js'
+  main: 'lib/index.js'

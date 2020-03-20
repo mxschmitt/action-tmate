@@ -1,3 +1,3 @@
-const { main } = require(".")
+const { run } = require(".")
 
-main()
+run()
