@@ -1,8 +1,6 @@
 name: 'Debugging with tmate'
-description: 'Debug your GitHub Actions Environment'
+description: 'Debug your GitHub Actions Environment interactively by using SSH or a Web shell'
 author: 'Max Schmitt'
 runs:
   using: 'node12'
-  main: 'lib/main.js'
-icon: settings
-color: gray-dark
+  main: 'lib/index.js'
