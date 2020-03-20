@@ -45,7 +45,7 @@ async function run() {
       core.debug(`WebURL: ${tmateWeb}`);
       core.debug(`SSH: ${tmateSSH}`);
 
-      const skip = fsExists("/continue")
+      const skip = await fsExists("/continue")
       if (skip) {
         core.info("Existing debugging session")
         break
