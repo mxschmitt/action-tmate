@@ -19,3 +19,5 @@ jobs:
         run: npm run test
         env:
           CI: "true"
+      - name: Build project
+        run: npm run build

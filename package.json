@@ -6,6 +6,7 @@
   "main": "lib/main.js",
   "scripts": {
     "start": "node src/index.js",
+    "build": "ncc build src/main.js -o lib",
     "test": "jest"
   },
   "repository": {
@@ -23,6 +24,7 @@
     "@actions/core": "^1.2.3"
   },
   "devDependencies": {
+    "@zeit/ncc": "^0.21.1",
     "jest": "^25.1.0",
     "jest-circus": "^25.1.0"
   }
