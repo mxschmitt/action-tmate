@@ -24,7 +24,10 @@
     "@actions/core": "^1.2.3"
   },
   "devDependencies": {
+    "@babel/core": "^7.8.7",
+    "@babel/preset-env": "^7.8.7",
     "@zeit/ncc": "^0.21.1",
+    "babel-jest": "^25.1.0",
     "jest": "^25.1.0",
     "jest-circus": "^25.1.0"
   }

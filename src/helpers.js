@@ -1,4 +1,6 @@
-const execShellCommand = (cmd) => {
+import { spawn } from 'child_process'
+
+export const execShellCommand = (cmd) => {
   return new Promise((resolve, reject) => {
     const process = spawn(cmd, [], { shell: true })
     let stdout = ""
@@ -18,8 +20,4 @@ const execShellCommand = (cmd) => {
       resolve(stdout)
     });
   });
-}
-
-module.exports = {
-  execShellCommand
 }
