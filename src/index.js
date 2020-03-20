@@ -1,4 +1,5 @@
 import fs from "fs"
+import path from "path"
 import * as core from "@actions/core"
 
 import { execShellCommand } from "./helpers"
@@ -41,7 +42,7 @@ export async function run() {
       core.info(`WebURL: ${tmateWeb}`);
       core.info(`SSH: ${tmateSSH}`);
 
-      const skip = fs.existsSync("/continue")
+      const skip = fs.existsSync("/continue") || fs.existsSync(path.join(process.env.GITHUB_WORKSPACE), "continue")
       if (skip) {
         core.info("Existing debugging session because '/continue' file was created")
         break
