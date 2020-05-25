@@ -4,3 +4,8 @@ author: 'Max Schmitt'
 runs:
   using: 'node12'
   main: 'lib/index.js'
+inputs:
+  sudo:
+    description: 'If apt should be executed with sudo or without'
+    required: false
+    default: 'true'

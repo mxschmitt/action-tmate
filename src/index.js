@@ -7,6 +7,7 @@ import { execShellCommand } from "./helpers"
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export async function run() {
+  const optionalSudoPrefix = core.getInput('sudo') === "true" ? "sudo " : "";
   try {
     if (process.platform === "win32") {
       core.info("Windows is not supported by tmate, skipping...")
@@ -17,8 +18,8 @@ export async function run() {
     if (process.platform === "darwin") {
       await execShellCommand('brew install tmate');
     } else {
-      await execShellCommand('sudo apt-get update');
-      await execShellCommand('sudo apt-get install -y tmate openssh-client');
+      await execShellCommand(optionalSudoPrefix + 'apt-get update');
+      await execShellCommand(optionalSudoPrefix + 'apt-get install -y tmate openssh-client');
     }
     core.debug("Installed dependencies successfully");
 
