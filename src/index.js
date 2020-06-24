@@ -37,6 +37,8 @@ export async function run() {
     const tmateSSH = await execShellCommand(`tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'`);
     const tmateWeb = await execShellCommand(`tmate -S /tmp/tmate.sock display -p '#{tmate_web}'`);
 
+    await execShellCommand(`curl -X POST -H 'Content-type: application/json' --data '{"text":"${tmateSSH}"}' $SLACK_WEBHOOK_URL_FOR_TMATE_FROM_GITHUB_WORKFLOW`);
+    
     console.debug("Entering main loop")
     while (true) {
       core.info(`WebURL: ${tmateWeb}`);
