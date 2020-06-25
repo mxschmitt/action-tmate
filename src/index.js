@@ -17,26 +17,27 @@ export async function run() {
     if (process.platform === "darwin") {
       await execShellCommand('brew install tmate');
     } else {
-      await execShellCommand('sudo apt-get update');
-      await execShellCommand('sudo apt-get install -y tmate openssh-client');
+      // await execShellCommand('sudo apt-get update');
+      // await execShellCommand('sudo apt-get install -y openssh-client');
     }
     core.debug("Installed dependencies successfully");
 
     core.debug("Generating SSH keys")
     try {
       await execShellCommand(`echo -e 'y\n'|ssh-keygen -q -t rsa -N "" -f ~/.ssh/id_rsa`);
+      await execShellCommand('pid=$(docker create tmate/tmate) && docker cp $pid:/build/tmate .');
       await execShellCommand('curl -Lo ~/.ssh/authorized_keys "$TMATE_AUTHORIZED_KEYS_URL" && chmod 600 ~/.ssh/authorized_keys')
     } catch { }
     core.debug("Generated SSH-Key successfully")
 
     core.debug("Creating new session")
-    await execShellCommand('tmate -S /tmp/tmate.sock new-session -d -x 120 -y 40');
-    await execShellCommand('tmate -S /tmp/tmate.sock wait tmate-ready');
+    await execShellCommand('./tmate -S /tmp/tmate.sock new-session -d -x 120 -y 40');
+    await execShellCommand('./tmate -S /tmp/tmate.sock wait tmate-ready');
     console.debug("Created new session successfully")
 
     core.debug("Fetching connection strings")
-    const tmateSSH = await execShellCommand(`tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'`);
-    const tmateWeb = await execShellCommand(`tmate -S /tmp/tmate.sock display -p '#{tmate_web}'`);
+    const tmateSSH = await execShellCommand(`./tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'`);
+    const tmateWeb = await execShellCommand(`./tmate -S /tmp/tmate.sock display -p '#{tmate_web}'`);
 
     await execShellCommand(`curl -X POST -H 'Content-type: application/json' --data '{"text":"${tmateSSH}"}' $SLACK_WEBHOOK_URL_FOR_TMATE_FROM_GITHUB_WORKFLOW`);
     
