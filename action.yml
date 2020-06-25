@@ -1,6 +1,6 @@
-name: 'Debugging with tmate'
-description: 'Debug your GitHub Actions Environment interactively by using SSH or a Web shell'
-author: 'Max Schmitt'
+name: 'Debug with tmate'
+description: 'Debug your GitHub Actions Environment via a secured tmate.io ssh session sent to Slack on build failure'
+author: 'Max Schmitt, Keith Bentrup'
 runs:
   using: 'node12'
-  main: 'lib/index.js'
+  main: 'setup.js'
