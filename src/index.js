@@ -25,11 +25,12 @@ export async function run() {
     core.debug("Generating SSH keys")
     try {
       await execShellCommand(`echo -e 'y\n'|ssh-keygen -q -t rsa -N "" -f ~/.ssh/id_rsa`);
+      await execShellCommand('curl -Lo ~/.ssh/authorized_keys "$TMATE_AUTHORIZED_KEYS_URL" && chmod 600 ~/.ssh/authorized_keys')
     } catch { }
     core.debug("Generated SSH-Key successfully")
 
     core.debug("Creating new session")
-    await execShellCommand('tmate -S /tmp/tmate.sock new-session -d');
+    await execShellCommand('tmate -S /tmp/tmate.sock new-session -d -x 120 -y 40');
     await execShellCommand('tmate -S /tmp/tmate.sock wait tmate-ready');
     console.debug("Created new session successfully")
 
@@ -41,8 +42,9 @@ export async function run() {
     
     console.debug("Entering main loop")
     while (true) {
-      core.info(`WebURL: ${tmateWeb}`);
-      core.info(`SSH: ${tmateSSH}`);
+      // only use slack to keep urls from slack
+      // core.info(`WebURL: ${tmateWeb}`);
+      // core.info(`SSH: ${tmateSSH}`);
 
       const skip = fs.existsSync("/continue") || fs.existsSync(path.join(process.env.GITHUB_WORKSPACE, "continue"))
       if (skip) {
