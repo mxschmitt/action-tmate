@@ -1,3 +1,4 @@
+import os from "os"
 import fs from "fs"
 import path from "path"
 import * as core from "@actions/core"
@@ -24,6 +25,7 @@ export async function run() {
     core.debug("Installed dependencies successfully");
 
     core.debug("Generating SSH keys")
+    fs.mkdirSync(path.join(os.homedir(), ".ssh"), { recursive: true })
     try {
       await execShellCommand(`echo -e 'y\n'|ssh-keygen -q -t rsa -N "" -f ~/.ssh/id_rsa`);
     } catch { }

@@ -2,6 +2,7 @@ jest.mock('@actions/core');
 import * as core from "@actions/core"
 
 jest.mock("fs", () => ({
+  mkdirSync: () => true,
   existsSync: () => true
 }));
 jest.mock('./helpers');
