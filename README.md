@@ -9,9 +9,9 @@ This GitHub Action offers you a direct way to interact with the host system on w
 
 ## Supported Operating Systems
 
-- `Linux`
-- `macOS`
-- (`Window` is **not** supported. It will be skipped so that the Pipeline does not fail)
+- Linux
+- macOS
+- Windows
 
 ## Getting Started
 
