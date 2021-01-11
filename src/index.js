@@ -47,10 +47,10 @@ export async function run() {
       core.info(`WebURL: ${tmateWeb}`);
       core.info(`SSH: ${tmateSSH}`);
 
-      if (optionalTimeout > 0){
-        let now = new Date().getTime() / 1000;
-        if (startTime + optionalTimeout < now){
-          core.info(`Timeout`);
+      if (optionalTimeout > 0) {
+        const now = new Date().getTime() / 1000;
+        if (startTime + optionalTimeout < now) {
+          core.info(`tmate GitHub Action exceeded timeout`);
           process.exit(0)
         }
       }
