@@ -9,3 +9,7 @@ inputs:
     description: 'If apt should be executed with sudo or without'
     required: false
     default: 'true'
+  timeout:
+    description: 'Number of seconds to wait before closing the tmate session (set to 0 for unlimited)'
+    required: false
+    default: '0'

@@ -9,6 +9,8 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export async function run() {
   const optionalSudoPrefix = core.getInput('sudo') === "true" ? "sudo " : "";
+  const optionalTimeout = Number(core.getInput('timeout'));
+  const startTime = new Date().getTime() / 1000;
   try {
     core.debug("Installing dependencies")
     if (process.platform === "darwin") {
@@ -44,6 +46,14 @@ export async function run() {
     while (true) {
       core.info(`WebURL: ${tmateWeb}`);
       core.info(`SSH: ${tmateSSH}`);
+
+      if (optionalTimeout > 0){
+        let now = new Date().getTime() / 1000;
+        if (startTime + optionalTimeout < now){
+          core.info(`Timeout`);
+          process.exit(0)
+        }
+      }
 
       const skip = fs.existsSync(continuePath) || fs.existsSync(path.join(process.env.GITHUB_WORKSPACE, "continue"))
       if (skip) {
