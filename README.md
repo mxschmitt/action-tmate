@@ -53,7 +53,7 @@ jobs:
 
 ## Timeout
 
-By default the tmate session will remain open until the workflow times out. You can specify your own timeout in minutes if you wish to limit to reduce GitHub Actions usage.
+By default the tmate session will remain open until the workflow times out. You can [specify your own timeout](https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstepstimeout-minutes) in minutes if you wish to limit to reduce GitHub Actions usage.
 
 ```yaml
 name: CI
