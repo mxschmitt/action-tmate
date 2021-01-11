@@ -51,6 +51,24 @@ jobs:
         sudo: false
 ```
 
+## Timeout
+
+By default the tmate session will remain open indefinitely until the workflow times out. You can specify your own timeout in seconds if you wish to limit this and save GitHub Actions minutes.
+
+```yaml
+name: CI
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      with:
+        timeout: 900  # 15 minutes
+```
+
 ## Continue a workflow
 
 If you want to continue a workflow and you are inside a tmate session, just create a empty file with the name `continue` either in the root directory or in the project directory by running `touch continue` or `sudo touch /continue`.
