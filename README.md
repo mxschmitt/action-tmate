@@ -74,4 +74,5 @@ If you want to continue a workflow and you are inside a tmate session, just crea
 
 ## Connection string / URL is not visible
 
-The connection string will be written in the logs every 5 seconds. For more information checkout issue [#1](https://github.com/mxschmitt/action-tmate/issues/1).
+The connection string will be written in the logs every 5 seconds. For more information checkout issue [#1](https://github.com/mxschmitt/action-tmate/issues/1). 
+
