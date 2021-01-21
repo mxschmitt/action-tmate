@@ -28,5 +28,3 @@ export const execShellCommand = (cmd) => {
     });
   });
 }
-
-export const exitDebugSessionMessage = "Exiting debugging session because '/continue' file was created"

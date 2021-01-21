@@ -3,7 +3,7 @@ import fs from "fs"
 import path from "path"
 import * as core from "@actions/core"
 
-import { execShellCommand, exitDebugSessionMessage } from "./helpers"
+import { execShellCommand } from "./helpers"
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -47,7 +47,7 @@ export async function run() {
 
       const skip = fs.existsSync(continuePath) || fs.existsSync(path.join(process.env.GITHUB_WORKSPACE, "continue"))
       if (skip) {
-        core.info(exitDebugSessionMessage)
+        core.info("Existing debugging session because '/continue' file was created")
         break
       }
       await sleep(5000)
