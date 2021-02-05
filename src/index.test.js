@@ -1,5 +1,6 @@
 jest.mock('@actions/core');
 import * as core from "@actions/core"
+jest.mock('@actions/github');
 
 jest.mock("fs", () => ({
   mkdirSync: () => true,
@@ -22,7 +23,7 @@ describe('Tmate GitHub integration', () => {
     Object.defineProperty(process, "platform", {
       value: "win32"
     })
-    core.getInput.mockReturnValue("true")
+    core.getInput.mockReturnValueOnce("true").mockReturnValue("false")
     const customConnectionString = "foobar"
     execShellCommand.mockReturnValue(Promise.resolve(customConnectionString))
     await run()
@@ -35,7 +36,7 @@ describe('Tmate GitHub integration', () => {
     Object.defineProperty(process, "platform", {
       value: "linux"
     })
-    core.getInput.mockReturnValue("true")
+    core.getInput.mockReturnValueOnce("true").mockReturnValue("false")
     const customConnectionString = "foobar"
     execShellCommand.mockReturnValue(Promise.resolve(customConnectionString))
     await run()

@@ -68,6 +68,26 @@ jobs:
       timeout-minutes: 15
 ```
 
+## Use registered public SSH key(s)
+
+By default anybody can connect to the tmate session. You can opt-in to install the public SSH keys [that you have registered with your GitHub profile](https://docs.github.com/en/github/.authenticating-to-github/adding-a-new-ssh-key-to-your-github-account).
+
+```yaml
+name: CI
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      with:
+        limit-access-to-actor: true
+```
+
+If the registered public SSH key is not your default private SSH key, you will need to specify the path manually, like so: `ssh -i <path-to-key> <tmate-connection-string>`.
+
 ## Continue a workflow
 
 If you want to continue a workflow and you are inside a tmate session, just create a empty file with the name `continue` either in the root directory or in the project directory by running `touch continue` or `sudo touch /continue`.
