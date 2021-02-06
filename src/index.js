@@ -47,7 +47,7 @@ export async function run() {
 
       const skip = fs.existsSync(continuePath) || fs.existsSync(path.join(process.env.GITHUB_WORKSPACE, "continue"))
       if (skip) {
-        core.info("Existing debugging session because '/continue' file was created")
+        core.info("Exiting debugging session because '/continue' file was created")
         break
       }
       await sleep(5000)
