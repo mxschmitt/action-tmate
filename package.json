@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node src/index.js",
     "build": "ncc build src/main.js -o lib",
-    "test": "jest"
+    "test": "GITHUB_EVENT_PATH= jest"
   },
   "repository": {
     "type": "git",
@@ -21,7 +21,9 @@
   "author": "GitHub",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.2.5"
+    "@actions/core": "^1.2.5",
+    "@actions/github": "^4.0.0",
+    "@octokit/rest": "^18.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",

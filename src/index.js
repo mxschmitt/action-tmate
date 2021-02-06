@@ -2,6 +2,8 @@ import os from "os"
 import fs from "fs"
 import path from "path"
 import * as core from "@actions/core"
+import * as github from "@actions/github"
+import { Octokit } from "@octokit/rest"
 
 import { execShellCommand } from "./helpers"
 
@@ -30,8 +32,26 @@ export async function run() {
       core.debug("Generated SSH-Key successfully")
     }
 
+    let newSessionExtra = ""
+    if (core.getInput("limit-access-to-actor") === "true") {
+      const actor = github.context.actor
+      const octokit = new Octokit()
+
+      const keys = await octokit.users.listPublicKeysForUser({
+        username: actor
+      })
+      if (keys.data.length < 1) {
+        throw new Error(`No public SSH keys registered with ${actor}'s GitHub profile`)
+      }
+      const sshPath = path.join(os.homedir(), ".ssh")
+      await fs.promises.mkdir(sshPath, { recursive: true })
+      const authorizedKeysPath = path.join(sshPath, "authorized_keys")
+      await fs.promises.writeFile(authorizedKeysPath, keys.data.map(e => e.key).join('\n'))
+      newSessionExtra = `-a "${authorizedKeysPath}"`
+    }
+
     core.debug("Creating new session")
-    await execShellCommand('tmate -S /tmp/tmate.sock new-session -d');
+    await execShellCommand(`tmate -S /tmp/tmate.sock ${newSessionExtra} new-session -d`);
     await execShellCommand('tmate -S /tmp/tmate.sock wait tmate-ready');
     console.debug("Created new session successfully")
 
