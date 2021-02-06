@@ -21,3 +21,10 @@ jobs:
           CI: "true"
       - name: Build project
         run: npm run build
+      - name: Verify that the project is built
+        run: |
+          if [[ -n $(git status -s) ]]; then
+            echo "ERROR: generated dist/ differs from the current sources"
+            git diff
+            exit 1
+          fi
