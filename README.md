@@ -1,4 +1,4 @@
-# Debug your [GitHub Actions](https://github.com/features/actions) by using tmate
+# Debug your [GitHub Actions](https://github.com/features/actions) by using [tmate](https://tmate.io)
 
 This GitHub Action offers you a direct way to interact with the host system on which the actual scripts (Actions) will run.
 

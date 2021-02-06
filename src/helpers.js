@@ -1,5 +1,10 @@
+// @ts-check
 import { spawn } from 'child_process'
 
+/**
+ * @param {string} cmd
+ * @returns {Promise<string>}
+ */
 export const execShellCommand = (cmd) => {
   return new Promise((resolve, reject) => {
     const process = global.process.platform !== "win32" ?
@@ -24,7 +29,7 @@ export const execShellCommand = (cmd) => {
       if (code !== 0) {
         reject(new Error(code ? code.toString() : undefined))
       }
-      resolve(stdout)
+      resolve(stdout.trim())
     });
   });
 }

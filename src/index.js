@@ -1,3 +1,4 @@
+// @ts-check
 import os from "os"
 import fs from "fs"
 import path from "path"
@@ -7,6 +8,7 @@ import { Octokit } from "@octokit/rest"
 
 import { execShellCommand } from "./helpers"
 
+/** @param {number} ms */
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export async function run() {
@@ -60,19 +62,24 @@ export async function run() {
     const tmateWeb = await execShellCommand(`tmate -S /tmp/tmate.sock display -p '#{tmate_web}'`);
 
     console.debug("Entering main loop")
-    const continuePath = process.platform !== "win32" ? "/continue" : "C:/msys64/continue"
     while (true) {
-      core.info(`WebURL: ${tmateWeb}`);
+      core.info(`Web shell: ${tmateWeb}`);
       core.info(`SSH: ${tmateSSH}`);
 
-      const skip = fs.existsSync(continuePath) || fs.existsSync(path.join(process.env.GITHUB_WORKSPACE, "continue"))
-      if (skip) {
+      if (continueFileExists()) {
         core.info("Exiting debugging session because '/continue' file was created")
         break
       }
+
       await sleep(5000)
     }
+
   } catch (error) {
     core.setFailed(error.message);
   }
+}
+
+function continueFileExists() {
+  const continuePath = process.platform !== "win32" ? "/continue" : "C:/msys64/continue"
+  return fs.existsSync(continuePath) || fs.existsSync(path.join(process.env.GITHUB_WORKSPACE, "continue"))
 }
