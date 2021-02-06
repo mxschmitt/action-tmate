@@ -43,7 +43,7 @@ export async function run() {
       if (keys.data.length < 1) {
         throw new Error(`No public SSH keys registered with ${actor}'s GitHub profile`)
       }
-      const sshPath = path.join(process.env.HOME, ".ssh")
+      const sshPath = path.join(os.homedir(), ".ssh")
       await fs.promises.mkdir(sshPath, { recursive: true })
       const authorizedKeysPath = path.join(sshPath, "authorized_keys")
       await fs.promises.writeFile(authorizedKeysPath, keys.data.map(e => e.key).join('\n'))
