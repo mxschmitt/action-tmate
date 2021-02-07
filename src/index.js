@@ -3,9 +3,12 @@ import fs from "fs"
 import path from "path"
 import * as core from "@actions/core"
 import * as github from "@actions/github"
+import * as tc from "@actions/tool-cache"
 import { Octokit } from "@octokit/rest"
 
 import { execShellCommand } from "./helpers"
+
+const TMATE_LINUX_VERSION = "2.4.0"
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -13,14 +16,22 @@ export async function run() {
   const optionalSudoPrefix = core.getInput('sudo') === "true" ? "sudo " : "";
   try {
     core.debug("Installing dependencies")
+    let tmateExecutable = "tmate"
     if (process.platform === "darwin") {
       await execShellCommand('brew install tmate');
     } else if (process.platform === "win32") {
       await execShellCommand('pacman -Sy --noconfirm tmate');
     } else {
       await execShellCommand(optionalSudoPrefix + 'apt-get update');
-      await execShellCommand(optionalSudoPrefix + 'apt-get install -y tmate openssh-client');
+      await execShellCommand(optionalSudoPrefix + 'apt-get install -y openssh-client');
+
+      const tmateReleaseTar = await tc.downloadTool(`https://github.com/tmate-io/tmate/releases/download/${TMATE_LINUX_VERSION}/tmate-${TMATE_LINUX_VERSION}-static-linux-amd64.tar.xz`);
+      const tmateDir = path.join(os.tmpdir(), "tmate")
+      tmateExecutable = path.join(tmateDir, "tmate")
+      fs.mkdirSync(tmateDir)
+      await execShellCommand(`tar x -C ${tmateDir} -f ${tmateReleaseTar} --strip-components=1`)
     }
+
     core.debug("Installed dependencies successfully");
 
     if (process.platform !== "win32") {
@@ -34,13 +45,13 @@ export async function run() {
 
     let newSessionExtra = ""
     if (core.getInput("limit-access-to-actor") === "true") {
-      const actor = github.context.actor
+      const { actor } = github.context
       const octokit = new Octokit()
 
       const keys = await octokit.users.listPublicKeysForUser({
         username: actor
       })
-      if (keys.data.length < 1) {
+      if (keys.data.length === 0) {
         throw new Error(`No public SSH keys registered with ${actor}'s GitHub profile`)
       }
       const sshPath = path.join(os.homedir(), ".ssh")
@@ -51,13 +62,13 @@ export async function run() {
     }
 
     core.debug("Creating new session")
-    await execShellCommand(`tmate -S /tmp/tmate.sock ${newSessionExtra} new-session -d`);
-    await execShellCommand('tmate -S /tmp/tmate.sock wait tmate-ready');
+    await execShellCommand(`${tmateExecutable} -S /tmp/tmate.sock ${newSessionExtra} new-session -d`);
+    await execShellCommand(`${tmateExecutable} -S /tmp/tmate.sock wait tmate-ready`);
     console.debug("Created new session successfully")
 
     core.debug("Fetching connection strings")
-    const tmateSSH = await execShellCommand(`tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'`);
-    const tmateWeb = await execShellCommand(`tmate -S /tmp/tmate.sock display -p '#{tmate_web}'`);
+    const tmateSSH = await execShellCommand(`${tmateExecutable} -S /tmp/tmate.sock display -p '#{tmate_ssh}'`);
+    const tmateWeb = await execShellCommand(`${tmateExecutable} -S /tmp/tmate.sock display -p '#{tmate_web}'`);
 
     console.debug("Entering main loop")
     const continuePath = process.platform !== "win32" ? "/continue" : "C:/msys64/continue"
@@ -73,6 +84,6 @@ export async function run() {
       await sleep(5000)
     }
   } catch (error) {
-    core.setFailed(error.message);
+    core.setFailed(error);
   }
 }

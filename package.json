@@ -23,6 +23,7 @@
   "dependencies": {
     "@actions/core": "^1.2.5",
     "@actions/github": "^4.0.0",
+    "@actions/tool-cache": "^1.6.1",
     "@octokit/rest": "^18.1.0"
   },
   "devDependencies": {

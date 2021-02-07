@@ -1,7 +1,10 @@
 jest.mock('@actions/core');
 import * as core from "@actions/core"
 jest.mock('@actions/github');
-
+jest.mock("@actions/tool-cache", () => ({
+  downloadTool: async () => "",
+  extractTar: async () => ""
+}));
 jest.mock("fs", () => ({
   mkdirSync: () => true,
   existsSync: () => true
