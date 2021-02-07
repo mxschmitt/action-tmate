@@ -74,7 +74,9 @@ export async function run() {
 
     console.debug("Entering main loop")
     while (true) {
-      core.info(`Web shell: ${tmateWeb}`);
+      if (tmateWeb) {
+        core.info(`Web shell: ${tmateWeb}`);
+      }
       core.info(`SSH: ${tmateSSH}`);
 
       if (continueFileExists()) {
