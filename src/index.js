@@ -23,6 +23,11 @@ export async function run() {
       await execShellCommand('brew install tmate');
     } else if (process.platform === "win32") {
       await execShellCommand('pacman -Sy --noconfirm tmate');
+
+      const bashProfilePath = "C:\\msys64\\etc\\profile"
+      let bashProfileContent = fs.readFileSync(bashProfilePath).toString()
+      bashProfileContent += '\ncd "${GITHUB_WORKSPACE}"\n'
+      fs.writeFileSync(bashProfilePath, bashProfileContent)
     } else {
       await execShellCommand(optionalSudoPrefix + 'apt-get update');
       await execShellCommand(optionalSudoPrefix + 'apt-get install -y openssh-client');
@@ -80,7 +85,7 @@ export async function run() {
       core.info(`SSH: ${tmateSSH}`);
 
       if (continueFileExists()) {
-        core.info("Exiting debugging session because '/continue' file was created")
+        core.info("Exiting debugging session because the continue file was created")
         break
       }
 
@@ -93,6 +98,6 @@ export async function run() {
 }
 
 function continueFileExists() {
-  const continuePath = process.platform !== "win32" ? "/continue" : "C:/msys64/continue"
-  return fs.existsSync(continuePath) || fs.existsSync(path.join(process.env.GITHUB_WORKSPACE, "continue"))
+  const rootDirContinuePath = process.platform === "win32" ? "C:/msys64/continue" : "/continue"
+  return fs.existsSync(rootDirContinuePath) || fs.existsSync(path.join(process.env.GITHUB_WORKSPACE, "continue"))
 }

@@ -7,7 +7,9 @@ jest.mock("@actions/tool-cache", () => ({
 }));
 jest.mock("fs", () => ({
   mkdirSync: () => true,
-  existsSync: () => true
+  existsSync: () => true,
+  readFileSync: () => "",
+  writeFileSync: () => true
 }));
 jest.mock('./helpers');
 import { execShellCommand } from "./helpers"
@@ -33,7 +35,7 @@ describe('Tmate GitHub integration', () => {
     expect(execShellCommand).toHaveBeenNthCalledWith(1, "pacman -Sy --noconfirm tmate")
     expect(core.info).toHaveBeenNthCalledWith(1, `Web shell: ${customConnectionString}`);
     expect(core.info).toHaveBeenNthCalledWith(2, `SSH: ${customConnectionString}`);
-    expect(core.info).toHaveBeenNthCalledWith(3, "Exiting debugging session because '/continue' file was created");
+    expect(core.info).toHaveBeenNthCalledWith(3, "Exiting debugging session because the continue file was created");
   });
   it('should be handle the main loop for linux', async () => {
     Object.defineProperty(process, "platform", {
@@ -46,7 +48,7 @@ describe('Tmate GitHub integration', () => {
     expect(execShellCommand).toHaveBeenNthCalledWith(1, "sudo apt-get update")
     expect(core.info).toHaveBeenNthCalledWith(1, `Web shell: ${customConnectionString}`);
     expect(core.info).toHaveBeenNthCalledWith(2, `SSH: ${customConnectionString}`);
-    expect(core.info).toHaveBeenNthCalledWith(3, "Exiting debugging session because '/continue' file was created");
+    expect(core.info).toHaveBeenNthCalledWith(3, "Exiting debugging session because the continue file was created");
   });
   it('should be handle the main loop for linux without sudo', async () => {
     Object.defineProperty(process, "platform", {
@@ -59,7 +61,7 @@ describe('Tmate GitHub integration', () => {
     expect(execShellCommand).toHaveBeenNthCalledWith(1, "apt-get update")
     expect(core.info).toHaveBeenNthCalledWith(1, `Web shell: ${customConnectionString}`);
     expect(core.info).toHaveBeenNthCalledWith(2, `SSH: ${customConnectionString}`);
-    expect(core.info).toHaveBeenNthCalledWith(3, "Exiting debugging session because '/continue' file was created");
+    expect(core.info).toHaveBeenNthCalledWith(3, "Exiting debugging session because the continue file was created");
   });
   it('should install tmate via brew for darwin', async () => {
     Object.defineProperty(process, "platform", {
