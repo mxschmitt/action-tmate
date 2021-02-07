@@ -19,12 +19,12 @@ export const execShellCommand = (cmd) => {
       })
     let stdout = ""
     proc.stdout.on('data', (data) => {
-      console.log(data.toString());
+      process.stdout.write(data);
       stdout += data.toString();
     });
 
     proc.stderr.on('data', (data) => {
-      console.error(data.toString());
+      process.stderr.write(data)
     });
 
     proc.on('exit', (code) => {
