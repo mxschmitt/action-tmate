@@ -11,27 +11,27 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/node12-template.git"
+    "url": "https://github.com/mxschmitt/action-tmate.git"
   },
   "keywords": [
     "actions",
     "node",
     "setup"
   ],
-  "author": "GitHub",
+  "author": "Max Schmitt <max@schmitt.mx>",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.2.5",
+    "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
     "@actions/tool-cache": "^1.6.1",
     "@octokit/rest": "^18.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.11.6",
-    "@babel/preset-env": "^7.11.5",
-    "@vercel/ncc": "^0.24.0",
-    "babel-jest": "^26.3.0",
-    "jest": "^26.4.2",
-    "jest-circus": "^26.4.2"
+    "@babel/core": "^7.12.13",
+    "@babel/preset-env": "^7.12.13",
+    "@vercel/ncc": "^0.27.0",
+    "babel-jest": "^26.6.3",
+    "jest": "^26.6.3",
+    "jest-circus": "^26.6.3"
   }
 }

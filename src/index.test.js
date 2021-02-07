@@ -31,7 +31,7 @@ describe('Tmate GitHub integration', () => {
     execShellCommand.mockReturnValue(Promise.resolve(customConnectionString))
     await run()
     expect(execShellCommand).toHaveBeenNthCalledWith(1, "pacman -Sy --noconfirm tmate")
-    expect(core.info).toHaveBeenNthCalledWith(1, `WebURL: ${customConnectionString}`);
+    expect(core.info).toHaveBeenNthCalledWith(1, `Web shell: ${customConnectionString}`);
     expect(core.info).toHaveBeenNthCalledWith(2, `SSH: ${customConnectionString}`);
     expect(core.info).toHaveBeenNthCalledWith(3, "Exiting debugging session because '/continue' file was created");
   });
@@ -44,7 +44,7 @@ describe('Tmate GitHub integration', () => {
     execShellCommand.mockReturnValue(Promise.resolve(customConnectionString))
     await run()
     expect(execShellCommand).toHaveBeenNthCalledWith(1, "sudo apt-get update")
-    expect(core.info).toHaveBeenNthCalledWith(1, `WebURL: ${customConnectionString}`);
+    expect(core.info).toHaveBeenNthCalledWith(1, `Web shell: ${customConnectionString}`);
     expect(core.info).toHaveBeenNthCalledWith(2, `SSH: ${customConnectionString}`);
     expect(core.info).toHaveBeenNthCalledWith(3, "Exiting debugging session because '/continue' file was created");
   });
@@ -57,7 +57,7 @@ describe('Tmate GitHub integration', () => {
     execShellCommand.mockReturnValue(Promise.resolve(customConnectionString))
     await run()
     expect(execShellCommand).toHaveBeenNthCalledWith(1, "apt-get update")
-    expect(core.info).toHaveBeenNthCalledWith(1, `WebURL: ${customConnectionString}`);
+    expect(core.info).toHaveBeenNthCalledWith(1, `Web shell: ${customConnectionString}`);
     expect(core.info).toHaveBeenNthCalledWith(2, `SSH: ${customConnectionString}`);
     expect(core.info).toHaveBeenNthCalledWith(3, "Exiting debugging session because '/continue' file was created");
   });
