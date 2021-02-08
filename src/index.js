@@ -23,6 +23,7 @@ export async function run() {
       await execShellCommand('brew install tmate');
     } else if (process.platform === "win32") {
       await execShellCommand('pacman -Sy --noconfirm tmate');
+      tmateExecutable = 'CHERE_INVOKING=1 tmate'
     } else {
       await execShellCommand(optionalSudoPrefix + 'apt-get update');
       await execShellCommand(optionalSudoPrefix + 'apt-get install -y openssh-client');
@@ -103,6 +104,6 @@ function didTmateQuit() {
 }
 
 function continueFileExists() {
-  const continuePath = process.platform !== "win32" ? "/continue" : "C:/msys64/continue"
+  const continuePath = process.platform === "win32" ? "C:/msys64/continue" : "/continue"
   return fs.existsSync(continuePath) || fs.existsSync(path.join(process.env.GITHUB_WORKSPACE, "continue"))
 }
