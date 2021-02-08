@@ -80,7 +80,7 @@ export async function run() {
       core.info(`SSH: ${tmateSSH}`);
 
       if (continueFileExists()) {
-        core.info("Exiting debugging session because '/continue' file was created")
+        core.info("Exiting debugging session because the continue file was created")
         break
       }
 
