@@ -93,6 +93,6 @@ export async function run() {
 }
 
 function continueFileExists() {
-  const continuePath = process.platform !== "win32" ? "/continue" : "C:/msys64/continue"
+  const continuePath = process.platform === "win32" ? "C:/msys64/continue" : "/continue"
   return fs.existsSync(continuePath) || fs.existsSync(path.join(process.env.GITHUB_WORKSPACE, "continue"))
 }
