@@ -84,12 +84,22 @@ export async function run() {
         break
       }
 
+      if (didTmateQuit()) {
+        core.info("Exiting debugging session 'tmate' quit")
+        break
+      }
+
       await sleep(5000)
     }
 
   } catch (error) {
     core.setFailed(error);
   }
+}
+
+function didTmateQuit() {
+  const tmateSocketPath = process.platform === "win32" ? "C:/msys64/tmp/tmate.sock" : "/tmp/tmate.sock"
+  return !fs.existsSync(tmateSocketPath)
 }
 
 function continueFileExists() {
