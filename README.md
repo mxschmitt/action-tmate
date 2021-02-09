@@ -1,10 +1,13 @@
 # Debug your [GitHub Actions](https://github.com/features/actions) by using [tmate](https://tmate.io)
 
+[![GitHub Actions](https://github.com/mxschmitt/action-tmate/workflows/Node.js%20CI/badge.svg)](https://github.com/mxschmitt/action-tmate/actions)
+[![GitHub Marketplace](https://img.shields.io/badge/GitHub-Marketplace-green)](https://github.com/marketplace/actions/debugging-with-tmate)
+
 This GitHub Action offers you a direct way to interact with the host system on which the actual scripts (Actions) will run.
 
 ## Features
 
-- Debug your GitHub Actions by using SSH
+- Debug your GitHub Actions by using SSH or Web shell
 - Continue your Workflows afterwards
 
 ## Supported Operating Systems
@@ -31,7 +34,7 @@ jobs:
 
 To get the connection string, just open the `Checks` tab in your Pull Request and scroll to the bottom. There you can connect either directly per SSH or via a web based terminal.
 
-![alt text](./docs/checks-tab.png "Logo Title Text 1")
+![GitHub Checks tab](./docs/checks-tab.png "GitHub Checks tab")
 
 ## Without sudo
 
