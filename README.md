@@ -68,7 +68,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
-      timeout-minutes: 15
+      with:
+        timeout-minutes: 15
 ```
 
 ## Use registered public SSH key(s)
