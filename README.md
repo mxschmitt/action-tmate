@@ -71,6 +71,22 @@ jobs:
       timeout-minutes: 15
 ```
 
+## Only on failure
+By default a failed step will cause all following steps to be skipped. You can specify that the tmate session only starts if a previous step [failed](https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#failure).
+
+```yaml
+name: CI
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup tmate session
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3
+```
+
 ## Use registered public SSH key(s)
 
 By default anybody can connect to the tmate session. You can opt-in to install the public SSH keys [that you have registered with your GitHub profile](https://docs.github.com/en/github/.authenticating-to-github/adding-a-new-ssh-key-to-your-github-account).
