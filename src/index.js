@@ -26,7 +26,7 @@ export async function run() {
       tmateExecutable = 'CHERE_INVOKING=1 tmate'
     } else {
       await execShellCommand(optionalSudoPrefix + 'apt-get update');
-      await execShellCommand(optionalSudoPrefix + 'apt-get install -y openssh-client');
+      await execShellCommand(optionalSudoPrefix + 'apt-get install -y openssh-client xz-utils');
 
       const tmateReleaseTar = await tc.downloadTool(`https://github.com/tmate-io/tmate/releases/download/${TMATE_LINUX_VERSION}/tmate-${TMATE_LINUX_VERSION}-static-linux-amd64.tar.xz`);
       const tmateDir = path.join(os.tmpdir(), "tmate")
