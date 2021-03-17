@@ -33,10 +33,10 @@ export async function run() {
       tmateExecutable = path.join(tmateDir, "tmate")
 
       if (fs.existsSync(tmateExecutable))
-        fs.rmdirSync(tmateExecutable)
+        fs.unlinkSync(tmateExecutable)
       fs.mkdirSync(tmateDir, { recursive: true })
       await execShellCommand(`tar x -C ${tmateDir} -f ${tmateReleaseTar} --strip-components=1`)
-      fs.rmdirSync(tmateReleaseTar)
+      fs.unlinkSync(tmateReleaseTar)
     }
 
     core.debug("Installed dependencies successfully");
