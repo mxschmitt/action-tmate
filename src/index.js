@@ -31,8 +31,12 @@ export async function run() {
       const tmateReleaseTar = await tc.downloadTool(`https://github.com/tmate-io/tmate/releases/download/${TMATE_LINUX_VERSION}/tmate-${TMATE_LINUX_VERSION}-static-linux-amd64.tar.xz`);
       const tmateDir = path.join(os.tmpdir(), "tmate")
       tmateExecutable = path.join(tmateDir, "tmate")
-      fs.mkdirSync(tmateDir)
+
+      if (fs.existsSync(tmateExecutable))
+        fs.rmdirSync(tmateExecutable)
+      fs.mkdirSync(tmateDir, { recursive: true })
       await execShellCommand(`tar x -C ${tmateDir} -f ${tmateReleaseTar} --strip-components=1`)
+      fs.rmdirSync(tmateReleaseTar)
     }
 
     core.debug("Installed dependencies successfully");
