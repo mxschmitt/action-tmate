@@ -68,14 +68,16 @@ export async function run() {
       newSessionExtra = `-a "${authorizedKeysPath}"`
     }
 
+    const tmate = `${tmateExecutable} -S /tmp/tmate.sock`;
+
     core.debug("Creating new session")
-    await execShellCommand(`${tmateExecutable} -S /tmp/tmate.sock ${newSessionExtra} new-session -d`);
-    await execShellCommand(`${tmateExecutable} -S /tmp/tmate.sock wait tmate-ready`);
+    await execShellCommand(`${tmate} ${newSessionExtra} new-session -d`);
+    await execShellCommand(`${tmate} wait tmate-ready`);
     console.debug("Created new session successfully")
 
     core.debug("Fetching connection strings")
-    const tmateSSH = await execShellCommand(`${tmateExecutable} -S /tmp/tmate.sock display -p '#{tmate_ssh}'`);
-    const tmateWeb = await execShellCommand(`${tmateExecutable} -S /tmp/tmate.sock display -p '#{tmate_web}'`);
+    const tmateSSH = await execShellCommand(`${tmate} display -p '#{tmate_ssh}'`);
+    const tmateWeb = await execShellCommand(`${tmate} display -p '#{tmate_web}'`);
 
     console.debug("Entering main loop")
     while (true) {
