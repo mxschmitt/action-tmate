@@ -9,6 +9,7 @@ jest.mock("fs", () => ({
   mkdirSync: () => true,
   existsSync: () => true,
   unlinkSync: () => true,
+  writeFileSync: () => true
 }));
 jest.mock('./helpers');
 import { execShellCommand } from "./helpers"
