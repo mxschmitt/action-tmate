@@ -71,7 +71,7 @@ export async function run() {
     const tmate = `${tmateExecutable} -S /tmp/tmate.sock`;
 
     // Work around potential `set -e` commands in `~/.profile` (looking at you, `setup-miniconda`!)
-    fs.writeFileSync('/tmp/tmate.bashrc', 'set +e\n');
+    await execShellCommand(`echo 'set +e' >/tmp/tmate.bashrc`);
     const setDefaultCommand = `set-option -g default-command "bash --rcfile /tmp/tmate.bashrc" \\;`;
 
     core.debug("Creating new session")
