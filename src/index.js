@@ -14,6 +14,11 @@ const TMATE_LINUX_VERSION = "2.4.0"
 /** @param {number} ms */
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+export async function installDependenciesLinux(optionalSudoPrefix='sudo') {
+  await execShellCommand(optionalSudoPrefix + 'apt-get update');
+  await execShellCommand(optionalSudoPrefix + 'apt-get install -y openssh-client xz-utils');
+}
+
 export async function run() {
   const optionalSudoPrefix = core.getInput('sudo') === "true" ? "sudo " : "";
   try {
@@ -25,9 +30,9 @@ export async function run() {
       await execShellCommand('pacman -Sy --noconfirm tmate');
       tmateExecutable = 'CHERE_INVOKING=1 tmate'
     } else {
-      await execShellCommand(optionalSudoPrefix + 'apt-get update');
-      await execShellCommand(optionalSudoPrefix + 'apt-get install -y openssh-client xz-utils');
-
+      if (core.getInput('install_dependencies') === "true") {
+        await installDependenciesLinux(optionalSudoPrefix);
+      }
       const tmateReleaseTar = await tc.downloadTool(`https://github.com/tmate-io/tmate/releases/download/${TMATE_LINUX_VERSION}/tmate-${TMATE_LINUX_VERSION}-static-linux-amd64.tar.xz`);
       const tmateDir = path.join(os.tmpdir(), "tmate")
       tmateExecutable = path.join(tmateDir, "tmate")
