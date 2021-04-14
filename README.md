@@ -75,7 +75,7 @@ You can then [manually run a workflow](https://docs.github.com/en/actions/managi
 
 ## Without sudo
 
-By default we run the commands using sudo. If you get `sudo: not found` you can use the parameter below to execute the commands directly.
+By default we run installation commands using sudo on Linux. If you get `sudo: not found` you can use the parameter below to execute the commands directly.
 
 ```yaml
 name: CI
@@ -163,6 +163,22 @@ jobs:
         tmate-server-port: 22
         tmate-server-rsa-fingerprint: SHA256:Hthk2T/M/Ivqfk1YYUn5ijC2Att3+UPzD7Rn72P5VWs
         tmate-server-ed25519-fingerprint: SHA256:jfttvoypkHiQYUqUCwKeqd9d1fJj/ZiQlFOHVl6E9sI
+```
+
+## Skip installing tmate
+
+By default, tmate and its dependencies are installed in a platform-dependent manner. When using self-hosted agents, this can become unnecessary or can even break. You can skip installing tmate and its dependencies using `install-dependencies`:
+
+```yaml
+name: CI
+on: [push]
+jobs:
+  build:
+    runs-on: [self-hosted, linux]
+    steps:
+    - uses: mxschmitt/action-tmate@v3
+      with:
+        install-dependencies: false
 ```
 
 ## Continue a workflow
