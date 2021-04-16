@@ -36,6 +36,37 @@ To get the connection string, just open the `Checks` tab in your Pull Request an
 
 ![GitHub Checks tab](./docs/checks-tab.png "GitHub Checks tab")
 
+## Manually triggered debug
+
+Instead of having to add/remove, or uncomment the required config and push commits each time you want to run your workflow with debug, you can make the debug step conditional on an optional parameter that you provide through a [`workflow_dispatch`](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) "manual event".
+
+Add the following to the `on` events of your workflow:
+
+```yaml
+on:
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'     
+        required: false
+        default: false
+```
+
+Then add an [`if`](https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions) condition to the debug step:
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Enable tmate debugging of manually-triggered workflows if the input option was provided
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
+```
+
+You can then [manually run a workflow](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow) on the desired branch and set `debug_enabled` to true to get a debug session.
+
 ## Without sudo
 
 By default we run the commands using sudo. If you get `sudo: not found` you can use the parameter below to execute the commands directly.
