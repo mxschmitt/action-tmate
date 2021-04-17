@@ -54,6 +54,9 @@ on:
 
 Then add an [`if`](https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions) condition to the debug step:
 
+<!--
+{% raw %}
+-->
 ```yaml
 jobs:
   build:
@@ -64,6 +67,9 @@ jobs:
         uses: mxschmitt/action-tmate@v3
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
 ```
+<!--
+{% endraw %}
+-->
 
 You can then [manually run a workflow](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow) on the desired branch and set `debug_enabled` to true to get a debug session.
 
