@@ -9,6 +9,10 @@ inputs:
     description: 'If apt should be executed with sudo or without'
     required: false
     default: 'true'
+  install_dependencies:
+    description: 'Whether or not to install dependencies for tmate on linux (openssh-client, xz-utils)'
+    required: false
+    default: 'true'
   limit-access-to-actor:
     description: 'If only the public SSH keys of the user triggering the workflow should be authorized'
     required: false
