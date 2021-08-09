@@ -28,7 +28,24 @@ export async function run() {
       await execShellCommand(optionalSudoPrefix + 'apt-get update');
       await execShellCommand(optionalSudoPrefix + 'apt-get install -y openssh-client xz-utils');
 
-      const tmateReleaseTar = await tc.downloadTool(`https://github.com/tmate-io/tmate/releases/download/${TMATE_LINUX_VERSION}/tmate-${TMATE_LINUX_VERSION}-static-linux-amd64.tar.xz`);
+      // Possible os.arch() values documented here:
+      // https://nodejs.org/api/os.html#os_os_arch
+      // Available tmate binaries listed here:
+      // https://github.com/tmate-io/tmate/releases/
+      let tmateArch;
+      switch (os.arch()) {
+        case 'arm64':
+          tmateArch = 'arm64v8';
+          break;
+        case 'x64':
+          tmateArch = 'amd64';
+          break;
+        default:
+          throw new Error(`Unsupported architecture: ${os.arch()}`)
+          break;
+      }
+
+      const tmateReleaseTar = await tc.downloadTool(`https://github.com/tmate-io/tmate/releases/download/${TMATE_LINUX_VERSION}/tmate-${TMATE_LINUX_VERSION}-static-linux-${tmateArch}.tar.xz`);
       const tmateDir = path.join(os.tmpdir(), "tmate")
       tmateExecutable = path.join(tmateDir, "tmate")
 
