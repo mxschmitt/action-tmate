@@ -11,6 +11,16 @@ import { execShellCommand } from "./helpers"
 
 const TMATE_LINUX_VERSION = "2.4.0"
 
+// Map os.arch() values to the architectures in tmate release binary filenames.
+// Possible os.arch() values documented here:
+// https://nodejs.org/api/os.html#os_os_arch
+// Available tmate binaries listed here:
+// https://github.com/tmate-io/tmate/releases/
+const TMATE_ARCH_MAP = {
+  arm64: 'arm64v8',
+  x64: 'amd64',
+};
+
 /** @param {number} ms */
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -28,23 +38,10 @@ export async function run() {
       await execShellCommand(optionalSudoPrefix + 'apt-get update');
       await execShellCommand(optionalSudoPrefix + 'apt-get install -y openssh-client xz-utils');
 
-      // Possible os.arch() values documented here:
-      // https://nodejs.org/api/os.html#os_os_arch
-      // Available tmate binaries listed here:
-      // https://github.com/tmate-io/tmate/releases/
-      let tmateArch;
-      switch (os.arch()) {
-        case 'arm64':
-          tmateArch = 'arm64v8';
-          break;
-        case 'x64':
-          tmateArch = 'amd64';
-          break;
-        default:
-          throw new Error(`Unsupported architecture: ${os.arch()}`)
-          break;
+      const tmateArch = TMATE_ARCH_MAP[os.arch()];
+      if (!tmateArch) {
+        throw new Error(`Unsupported architecture: ${os.arch()}`)
       }
-
       const tmateReleaseTar = await tc.downloadTool(`https://github.com/tmate-io/tmate/releases/download/${TMATE_LINUX_VERSION}/tmate-${TMATE_LINUX_VERSION}-static-linux-${tmateArch}.tar.xz`);
       const tmateDir = path.join(os.tmpdir(), "tmate")
       tmateExecutable = path.join(tmateDir, "tmate")
