@@ -88,6 +88,15 @@ export async function run() {
     await execShellCommand(`echo 'set +e' >/tmp/tmate.bashrc`);
     const setDefaultCommand = `set-option -g default-command "bash --rcfile /tmp/tmate.bashrc" \\;`;
 
+    const tmateConfPath = path.join(os.homedir(), ".tmate.conf")
+    if (core.getInput("tmate-server-host") !== "") {
+      core.debug("Configure your tmate server")
+      await execShellCommand(`echo 'set -g tmate-server-host ${core.getInput("tmate-server-host")}' >> ${tmateConfPath}`)
+      await execShellCommand(`echo 'set -g tmate-server-port ${core.getInput("tmate-server-port")}' >> ${tmateConfPath}`)
+      await execShellCommand(`echo 'set -g tmate-server-rsa-fingerprint ${core.getInput("tmate-server-rsa-fingerprint")}' >> ${tmateConfPath}`)
+      await execShellCommand(`echo 'set -g tmate-server-ed25519-fingerprint ${core.getInput("tmate-server-ed25519-fingerprint")}' >> ${tmateConfPath}`)
+    }
+
     core.debug("Creating new session")
     await execShellCommand(`${tmate} ${newSessionExtra} ${setDefaultCommand} new-session -d`);
     await execShellCommand(`${tmate} wait tmate-ready`);
