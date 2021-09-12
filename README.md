@@ -146,7 +146,7 @@ If the registered public SSH key is not your default private SSH key, you will n
 
 ## Use your own tmate servers
 
-By default the tmate session use `ssh.tmate.io`. You can use your own tmate servers. [tmate-ssh-server](https://github.com/tmate-io/tmate-ssh-server) is the server side part of tmate.
+By default the tmate session uses `ssh.tmate.io`. You can use your own tmate servers. [tmate-ssh-server](https://github.com/tmate-io/tmate-ssh-server) is the server side part of tmate.
 
 ```yaml
 name: CI
