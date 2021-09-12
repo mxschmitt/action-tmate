@@ -126,7 +126,7 @@ jobs:
 
 ## Use registered public SSH key(s)
 
-By default anybody can connect to the tmate session. You can opt-in to install the public SSH keys [that you have registered with your GitHub profile](https://docs.github.com/en/github/.authenticating-to-github/adding-a-new-ssh-key-to-your-github-account).
+By default anybody can connect to the tmate session. You can opt-in to install the public SSH keys [that you have registered with your GitHub profile](https://docs.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account).
 
 ```yaml
 name: CI
