@@ -27,6 +27,8 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 export async function run() {
   const optionalSudoPrefix = core.getInput('sudo') === "true" ? "sudo " : "";
   try {
+    await isValidInputOwnServer(core.getInput("tmate-server-host"), core.getInput("tmate-server-port"), core.getInput("tmate-server-rsa-fingerprint"), core.getInput("tmate-server-ed25519-fingerprint"));
+
     core.debug("Installing dependencies")
     let tmateExecutable = "tmate"
     if (process.platform === "darwin") {

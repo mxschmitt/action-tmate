@@ -35,3 +35,37 @@ export const execShellCommand = (cmd) => {
     });
   });
 }
+
+/**
+ * @param {string} host
+ * @param {string} port
+ * @param {string} rsaFingerprint
+ * @param {string} ed25519Fingerprint
+ * @return {Promise<string>}
+ */
+const isValidInputOwnServer = (host, port, rsaFingerprint, ed25519Fingerprint) => {
+  return new Promise((resolve, reject) => {
+    if (!host && !port && !rsaFingerprint && !ed25519Fingerprint) {
+      return resolve()
+    };
+
+    // validate port
+    const parsedPort = parseInt(port, 10)
+    if (isNaN(parsedPort)) {
+      return reject(new Error("tmate-server-port is not a valid integer"))
+    } else if (parsedPort < 1 || 65535 < parsedPort) {
+      return reject(new Error("tmate-server-port does not contain a valid range"))
+    };
+
+    // validate fingerprint
+    const validFingerprintPrefix = "SHA256:"
+    if (!rsaFingerprint.startsWith(validFingerprintPrefix)) {
+      return reject(new Error("tmate-server-rsa-fingerprint has no prefix SHA256:"))
+    };
+    if (!ed25519Fingerprint.startsWith(validFingerprintPrefix)) {
+      return reject(new Error("tmate-server-ed25519-fingerprint has no prefix SHA256:"))
+    };
+
+    return resolve()
+  });
+}
