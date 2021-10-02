@@ -37,6 +37,10 @@ export const execShellCommand = (cmd) => {
   });
 }
 
+/**
+ * @param {string} key
+ * @return {string}
+ */
 export const getValidatedInput = (key) => {
 	const regex = new RegExp('/^[-.+A-Za-z0-9]*$/')
   const value = core.getInput(key);
