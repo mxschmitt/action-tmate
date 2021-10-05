@@ -1,5 +1,7 @@
 name: 'Debugging with tmate'
 description: 'Debug your GitHub Actions Environment interactively by using SSH or a Web shell'
+branding:
+  icon: terminal
 author: 'Max Schmitt'
 runs:
   using: 'node12'
