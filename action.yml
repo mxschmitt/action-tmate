@@ -13,3 +13,19 @@ inputs:
     description: 'If only the public SSH keys of the user triggering the workflow should be authorized'
     required: false
     default: 'false'
+  tmate-server-host:
+    description: 'The hostname for your tmate server'
+    required: false
+    default: ''
+  tmate-server-port:
+    description: 'The port for your tmate server'
+    required: false
+    default: ''
+  tmate-server-rsa-fingerprint:
+    description: 'The RSA fingerprint for your tmate server'
+    required: false
+    default: ''
+  tmate-server-ed25519-fingerprint:
+    description: 'The ed25519 fingerprint for your tmate server'
+    required: false
+    default: ''

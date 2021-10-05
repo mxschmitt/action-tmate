@@ -7,7 +7,7 @@ import * as github from "@actions/github"
 import * as tc from "@actions/tool-cache"
 import { Octokit } from "@octokit/rest"
 
-import { execShellCommand } from "./helpers"
+import { execShellCommand, getValidatedInput } from "./helpers"
 
 const TMATE_LINUX_VERSION = "2.4.0"
 
@@ -86,7 +86,14 @@ export async function run() {
 
     // Work around potential `set -e` commands in `~/.profile` (looking at you, `setup-miniconda`!)
     await execShellCommand(`echo 'set +e' >/tmp/tmate.bashrc`);
-    const setDefaultCommand = `set-option -g default-command "bash --rcfile /tmp/tmate.bashrc" \\;`;
+    let setDefaultCommand = `set-option -g default-command "bash --rcfile /tmp/tmate.bashrc" \\;`;
+
+    if (core.getInput("tmate-server-host") !== "") {
+      setDefaultCommand = `${setDefaultCommand} set-option -g tmate-server-host "${getValidatedInput("tmate-server-host")}" \\;`;
+      setDefaultCommand = `${setDefaultCommand} set-option -g tmate-server-port "${getValidatedInput("tmate-server-port")}" \\;`;
+      setDefaultCommand = `${setDefaultCommand} set-option -g tmate-server-rsa-fingerprint "${getValidatedInput("tmate-server-rsa-fingerprint")}" \\;`;
+      setDefaultCommand = `${setDefaultCommand} set-option -g tmate-server-ed25519-fingerprint "${getValidatedInput("tmate-server-ed25519-fingerprint")}" \\;`;
+    }
 
     core.debug("Creating new session")
     await execShellCommand(`${tmate} ${newSessionExtra} ${setDefaultCommand} new-session -d`);

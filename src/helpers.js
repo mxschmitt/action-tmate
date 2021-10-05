@@ -1,5 +1,6 @@
 // @ts-check
 import { spawn } from 'child_process'
+import * as core from "@actions/core"
 
 /**
  * @param {string} cmd
@@ -34,4 +35,16 @@ export const execShellCommand = (cmd) => {
       resolve(stdout.trim())
     });
   });
+}
+
+/**
+ * @param {string} key
+ * @return {string}
+ */
+export const getValidatedInput = (key) => {
+  const value = core.getInput(key);
+  if (/^[-.+A-Za-z0-9]*$/.test(value)) {
+    throw new Error(`Invalid value for '${key}': '${value}'`);
+  }
+  return value;
 }
