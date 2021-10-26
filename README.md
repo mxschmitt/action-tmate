@@ -109,7 +109,7 @@ jobs:
 ```
 
 ## Only on failure
-By default a failed step will cause all following steps to be skipped. You can specify that the tmate session only starts if a previous step [failed](https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#failure).
+By default a failed step will cause all following steps to be skipped. You can specify that the tmate session only starts if a previous step [failed](https://docs.github.com/en/actions/learn-github-actions/expressions#failure).
 
 ```yaml
 name: CI
