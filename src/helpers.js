@@ -7,6 +7,7 @@ import * as core from "@actions/core"
  * @returns {Promise<string>}
  */
 export const execShellCommand = (cmd) => {
+  core.debug(`Executing shell command: [${cmd}]`)
   return new Promise((resolve, reject) => {
     const proc = process.platform !== "win32" ?
       spawn(cmd, [], { shell: true }) :
@@ -47,4 +48,13 @@ export const getValidatedInput = (key) => {
     throw new Error(`Invalid value for '${key}': '${value}'`);
   }
   return value;
+}
+
+
+/**
+ * @return {Promise<string>}
+ */
+export const getLinuxDistro = () => {
+  const distro = execShellCommand("cat /etc/os-release | grep ^ID=").then(output => output.substring(3)/* trim 'ID=' */.trim());
+  return distro;
 }

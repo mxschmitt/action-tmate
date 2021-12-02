@@ -7,7 +7,7 @@ import * as github from "@actions/github"
 import * as tc from "@actions/tool-cache"
 import { Octokit } from "@octokit/rest"
 
-import { execShellCommand, getValidatedInput } from "./helpers"
+import { execShellCommand, getValidatedInput, getLinuxDistro } from "./helpers"
 
 const TMATE_LINUX_VERSION = "2.4.0"
 
@@ -35,8 +35,15 @@ export async function run() {
       await execShellCommand('pacman -Sy --noconfirm tmate');
       tmateExecutable = 'CHERE_INVOKING=1 tmate'
     } else {
-      await execShellCommand(optionalSudoPrefix + 'apt-get update');
-      await execShellCommand(optionalSudoPrefix + 'apt-get install -y openssh-client xz-utils');
+      const distro = await getLinuxDistro();
+      core.debug("linux distro: [" + distro + "]");
+      if (distro === "alpine") {
+        // for set -e workaround, we need to install bash because alpine doesn't have it
+        await execShellCommand(optionalSudoPrefix + 'apk add openssh-client xz bash');
+      } else {
+        await execShellCommand(optionalSudoPrefix + 'apt-get update');
+        await execShellCommand(optionalSudoPrefix + 'apt-get install -y openssh-client xz-utils');
+      }
 
       const tmateArch = TMATE_ARCH_MAP[os.arch()];
       if (!tmateArch) {
