@@ -1,6 +1,7 @@
 // @ts-check
 import { spawn } from 'child_process'
 import * as core from "@actions/core"
+import fs from 'fs'
 
 /**
  * @param {string} cmd
@@ -54,7 +55,12 @@ export const getValidatedInput = (key) => {
 /**
  * @return {Promise<string>}
  */
-export const getLinuxDistro = () => {
-  const distro = execShellCommand("cat /etc/os-release | grep ^ID=").then(output => output.substring(3)/* trim 'ID=' */.trim());
-  return distro;
+export const getLinuxDistro = async () => {
+  try {
+    const osRelease = await fs.promises.readFile("/etc/os-release")
+    const match = osRelease.toString().match(/^ID=(.*)$/m)
+    return match ? match[1] : "(unknown)"
+  } catch (e) {
+    return "(unknown)"
+  }
 }
