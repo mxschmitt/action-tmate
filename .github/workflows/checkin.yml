@@ -1,30 +1,9 @@
-name: Node.js CI
-on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+name: CI
+on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: 12.x
-      - name: Install dependencies
-        run: npm ci
-      - name: Run tests
-        run: npm run test --coverage
-        env:
-          CI: "true"
-      - name: Build project
-        run: npm run build
-      - name: Verify that the project is built
-        run: |
-          if [[ -n $(git status -s) ]]; then
-            echo "ERROR: generated dist/ differs from the current sources"
-            git diff
-            exit 1
-          fi
+    - uses: actions/checkout@v2
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
