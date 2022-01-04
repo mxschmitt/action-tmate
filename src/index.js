@@ -25,44 +25,46 @@ const TMATE_ARCH_MAP = {
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export async function run() {
-  const optionalSudoPrefix = core.getInput('sudo') === "true" ? "sudo " : "";
   try {
-    core.debug("Installing dependencies")
     let tmateExecutable = "tmate"
-    if (process.platform === "darwin") {
-      await execShellCommand('brew install tmate');
-    } else if (process.platform === "win32") {
-      await execShellCommand('pacman -Sy --noconfirm tmate');
-      tmateExecutable = 'CHERE_INVOKING=1 tmate'
-    } else {
-      const distro = await getLinuxDistro();
-      core.debug("linux distro: [" + distro + "]");
-      if (distro === "alpine") {
-        // for set -e workaround, we need to install bash because alpine doesn't have it
-        await execShellCommand(optionalSudoPrefix + 'apk add openssh-client xz bash');
+    if (core.getInput("install-dependencies") !== "false") {
+      core.debug("Installing dependencies")
+      if (process.platform === "darwin") {
+        await execShellCommand('brew install tmate');
+      } else if (process.platform === "win32") {
+        await execShellCommand('pacman -Sy --noconfirm tmate');
       } else {
-        await execShellCommand(optionalSudoPrefix + 'apt-get update');
-        await execShellCommand(optionalSudoPrefix + 'apt-get install -y openssh-client xz-utils');
-      }
+        const optionalSudoPrefix = core.getInput("sudo") === "true" ? "sudo " : "";
+        const distro = await getLinuxDistro();
+        core.debug("linux distro: [" + distro + "]");
+        if (distro === "alpine") {
+          // for set -e workaround, we need to install bash because alpine doesn't have it
+          await execShellCommand(optionalSudoPrefix + 'apk add openssh-client xz bash');
+        } else {
+          await execShellCommand(optionalSudoPrefix + 'apt-get update');
+          await execShellCommand(optionalSudoPrefix + 'apt-get install -y openssh-client xz-utils');
+        }
 
-      const tmateArch = TMATE_ARCH_MAP[os.arch()];
-      if (!tmateArch) {
-        throw new Error(`Unsupported architecture: ${os.arch()}`)
-      }
-      const tmateReleaseTar = await tc.downloadTool(`https://github.com/tmate-io/tmate/releases/download/${TMATE_LINUX_VERSION}/tmate-${TMATE_LINUX_VERSION}-static-linux-${tmateArch}.tar.xz`);
-      const tmateDir = path.join(os.tmpdir(), "tmate")
-      tmateExecutable = path.join(tmateDir, "tmate")
+        const tmateArch = TMATE_ARCH_MAP[os.arch()];
+        if (!tmateArch) {
+          throw new Error(`Unsupported architecture: ${os.arch()}`)
+        }
+        const tmateReleaseTar = await tc.downloadTool(`https://github.com/tmate-io/tmate/releases/download/${TMATE_LINUX_VERSION}/tmate-${TMATE_LINUX_VERSION}-static-linux-${tmateArch}.tar.xz`);
+        const tmateDir = path.join(os.tmpdir(), "tmate")
+        tmateExecutable = path.join(tmateDir, "tmate")
 
-      if (fs.existsSync(tmateExecutable))
-        fs.unlinkSync(tmateExecutable)
-      fs.mkdirSync(tmateDir, { recursive: true })
-      await execShellCommand(`tar x -C ${tmateDir} -f ${tmateReleaseTar} --strip-components=1`)
-      fs.unlinkSync(tmateReleaseTar)
+        if (fs.existsSync(tmateExecutable))
+          fs.unlinkSync(tmateExecutable)
+        fs.mkdirSync(tmateDir, { recursive: true })
+        await execShellCommand(`tar x -C ${tmateDir} -f ${tmateReleaseTar} --strip-components=1`)
+        fs.unlinkSync(tmateReleaseTar)
+      }
+      core.debug("Installed dependencies successfully");
     }
 
-    core.debug("Installed dependencies successfully");
-
-    if (process.platform !== "win32") {
+    if (process.platform === "win32") {
+      tmateExecutable = 'CHERE_INVOKING=1 tmate'
+    } else {
       core.debug("Generating SSH keys")
       fs.mkdirSync(path.join(os.homedir(), ".ssh"), { recursive: true })
       try {
