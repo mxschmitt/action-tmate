@@ -97,11 +97,21 @@ export async function run() {
     await execShellCommand(`echo 'set +e' >/tmp/tmate.bashrc`);
     let setDefaultCommand = `set-option -g default-command "bash --rcfile /tmp/tmate.bashrc" \\;`;
 
-    if (core.getInput("tmate-server-host") !== "") {
-      setDefaultCommand = `${setDefaultCommand} set-option -g tmate-server-host "${getValidatedInput("tmate-server-host")}" \\;`;
-      setDefaultCommand = `${setDefaultCommand} set-option -g tmate-server-port "${getValidatedInput("tmate-server-port")}" \\;`;
-      setDefaultCommand = `${setDefaultCommand} set-option -g tmate-server-rsa-fingerprint "${getValidatedInput("tmate-server-rsa-fingerprint")}" \\;`;
-      setDefaultCommand = `${setDefaultCommand} set-option -g tmate-server-ed25519-fingerprint "${getValidatedInput("tmate-server-ed25519-fingerprint")}" \\;`;
+    // The regexes used here for validation are lenient, i.e. may accept
+    // values that are not, strictly speaking, valid, but should be good
+    // enough for detecting obvious errors, which is all we want here.
+    const options = {
+      "tmate-server-host": /^[a-z\d\-]+(\.[a-z\d\-]+)*$/i,
+      "tmate-server-port": /^\d{1,5}$/,
+      "tmate-server-rsa-fingerprint": /./,
+      "tmate-server-ed25519-fingerprint": /./,
+    }
+
+    for (const opt in options) {
+      const value = getValidatedInput(opt, options[opt]);
+      if (value !== undefined) {
+        setDefaultCommand = `${setDefaultCommand} set-option -g ${opt} "${value}" \\;`;
+      }
     }
 
     core.debug("Creating new session")
