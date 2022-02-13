@@ -107,10 +107,12 @@ export async function run() {
       "tmate-server-ed25519-fingerprint": /./,
     }
 
-    for (const opt in options) {
-      const value = getValidatedInput(opt, options[opt]);
+    for (const [key, option] of Object.entries(options)) {
+      if (core.getInput(key) === '')
+        continue;
+      const value = getValidatedInput(key, option);
       if (value !== undefined) {
-        setDefaultCommand = `${setDefaultCommand} set-option -g ${opt} "${value}" \\;`;
+        setDefaultCommand = `${setDefaultCommand} set-option -g ${key} "${value}" \\;`;
       }
     }
 

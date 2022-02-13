@@ -41,8 +41,8 @@ export const execShellCommand = (cmd) => {
 
 /**
  * @param {string} key
- * @param {regex} re regex to use for validation
- * @return {string}, {undefined} or throws an error if input doesn't match regex
+ * @param {RegExp} re regex to use for validation
+ * @return {string} {undefined} or throws an error if input doesn't match regex
  */
 export const getValidatedInput = (key, re) => {
   const value = core.getInput(key);
