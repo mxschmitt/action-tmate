@@ -113,6 +113,13 @@ describe('Tmate GitHub integration', () => {
     await run()
     expect(execShellCommand).not.toHaveBeenNthCalledWith(1, "brew install tmate")
   });
+  it('should work without any options', async () => {
+    core.getInput.mockReturnValue("");
+
+    await run()
+
+    expect(core.setFailed).not.toHaveBeenCalled();
+  });
   it('should validate correct tmate options', async () => {
     // Check for the happy path first.
     core.getInput.mockImplementation(function(opt) {
