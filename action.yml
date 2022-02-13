@@ -20,11 +20,11 @@ inputs:
     required: false
     default: 'false'
   tmate-server-host:
-    description: 'The hostname for your tmate server'
+    description: 'The hostname for your tmate server (e.g. ssh.example.org)'
     required: false
     default: ''
   tmate-server-port:
-    description: 'The port for your tmate server'
+    description: 'The port for your tmate server (e.g. 2222)'
     required: false
     default: ''
   tmate-server-rsa-fingerprint:
