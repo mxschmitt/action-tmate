@@ -57,7 +57,7 @@ describe('Tmate GitHub integration', () => {
     expect(core.info).toHaveBeenNthCalledWith(2, `SSH: ${customConnectionString}`);
     expect(core.info).toHaveBeenNthCalledWith(3, "Exiting debugging session because the continue file was created");
   });
-  it('should be handle the main loop for linux', async () => {
+  it('should handle the main loop for linux', async () => {
     Object.defineProperty(process, "platform", {
       value: "linux"
     })
@@ -70,7 +70,7 @@ describe('Tmate GitHub integration', () => {
     expect(core.info).toHaveBeenNthCalledWith(2, `SSH: ${customConnectionString}`);
     expect(core.info).toHaveBeenNthCalledWith(3, "Exiting debugging session because the continue file was created");
   });
-  it('should be handle the main loop for linux without sudo', async () => {
+  it('should handle the main loop for linux without sudo', async () => {
     Object.defineProperty(process, "platform", {
       value: "linux"
     })
@@ -83,7 +83,7 @@ describe('Tmate GitHub integration', () => {
     expect(core.info).toHaveBeenNthCalledWith(2, `SSH: ${customConnectionString}`);
     expect(core.info).toHaveBeenNthCalledWith(3, "Exiting debugging session because the continue file was created");
   });
-  it('should be handle the main loop for linux without installing dependencies', async () => {
+  it('should handle the main loop for linux without installing dependencies', async () => {
     Object.defineProperty(process, "platform", {
       value: "linux"
     })
@@ -113,6 +113,13 @@ describe('Tmate GitHub integration', () => {
     await run()
     expect(execShellCommand).not.toHaveBeenNthCalledWith(1, "brew install tmate")
   });
+  it('should work without any options', async () => {
+    core.getInput.mockReturnValue("");
+
+    await run()
+
+    expect(core.setFailed).not.toHaveBeenCalled();
+  });
   it('should validate correct tmate options', async () => {
     // Check for the happy path first.
     core.getInput.mockImplementation(function(opt) {
@@ -121,7 +128,7 @@ describe('Tmate GitHub integration', () => {
           case "tmate-server-port": return "22";
           case "tmate-server-rsa-fingerprint": return "SHA256:Hthk2T/M/Ivqfk1YYUn5ijC2Att3+UPzD7Rn72P5VWs";
           case "tmate-server-ed25519-fingerprint": return "SHA256:jfttvoypkHiQYUqUCwKeqd9d1fJj/ZiQlFOHVl6E9sI";
-          default: return undefined;
+          default: return "";
         }
     })
 
@@ -148,7 +155,7 @@ describe('Tmate GitHub integration', () => {
     core.getInput.mockImplementation(function(opt) {
         switch (opt) {
           case "tmate-server-host": return "not/a/valid/hostname";
-          default: return undefined;
+          default: return "";
         }
     })
 
