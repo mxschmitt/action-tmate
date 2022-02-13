@@ -121,7 +121,7 @@ describe('Tmate GitHub integration', () => {
           case "tmate-server-port": return "22";
           case "tmate-server-rsa-fingerprint": return "SHA256:Hthk2T/M/Ivqfk1YYUn5ijC2Att3+UPzD7Rn72P5VWs";
           case "tmate-server-ed25519-fingerprint": return "SHA256:jfttvoypkHiQYUqUCwKeqd9d1fJj/ZiQlFOHVl6E9sI";
-          default: return undefined;
+          default: return "";
         }
     })
 
@@ -148,7 +148,7 @@ describe('Tmate GitHub integration', () => {
     core.getInput.mockImplementation(function(opt) {
         switch (opt) {
           case "tmate-server-host": return "not/a/valid/hostname";
-          default: return undefined;
+          default: return "";
         }
     })
 
