@@ -57,7 +57,7 @@ describe('Tmate GitHub integration', () => {
     expect(core.info).toHaveBeenNthCalledWith(2, `SSH: ${customConnectionString}`);
     expect(core.info).toHaveBeenNthCalledWith(3, "Exiting debugging session because the continue file was created");
   });
-  it('should be handle the main loop for linux', async () => {
+  it('should handle the main loop for linux', async () => {
     Object.defineProperty(process, "platform", {
       value: "linux"
     })
@@ -70,7 +70,7 @@ describe('Tmate GitHub integration', () => {
     expect(core.info).toHaveBeenNthCalledWith(2, `SSH: ${customConnectionString}`);
     expect(core.info).toHaveBeenNthCalledWith(3, "Exiting debugging session because the continue file was created");
   });
-  it('should be handle the main loop for linux without sudo', async () => {
+  it('should handle the main loop for linux without sudo', async () => {
     Object.defineProperty(process, "platform", {
       value: "linux"
     })
@@ -83,7 +83,7 @@ describe('Tmate GitHub integration', () => {
     expect(core.info).toHaveBeenNthCalledWith(2, `SSH: ${customConnectionString}`);
     expect(core.info).toHaveBeenNthCalledWith(3, "Exiting debugging session because the continue file was created");
   });
-  it('should be handle the main loop for linux without installing dependencies', async () => {
+  it('should handle the main loop for linux without installing dependencies', async () => {
     Object.defineProperty(process, "platform", {
       value: "linux"
     })
