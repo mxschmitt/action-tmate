@@ -119,13 +119,13 @@ export async function run() {
     core.debug("Creating new session")
     await execShellCommand(`${tmate} ${newSessionExtra} ${setDefaultCommand} new-session -d`);
     await execShellCommand(`${tmate} wait tmate-ready`);
-    console.debug("Created new session successfully")
+    core.debug("Created new session successfully")
 
     core.debug("Fetching connection strings")
     const tmateSSH = await execShellCommand(`${tmate} display -p '#{tmate_ssh}'`);
     const tmateWeb = await execShellCommand(`${tmate} display -p '#{tmate_web}'`);
 
-    console.debug("Entering main loop")
+    core.debug("Entering main loop")
     while (true) {
       if (tmateWeb) {
         core.info(`Web shell: ${tmateWeb}`);
