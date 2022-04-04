@@ -4,7 +4,7 @@ branding:
   icon: terminal
 author: 'Max Schmitt'
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'lib/index.js'
 inputs:
   sudo:
