@@ -126,7 +126,7 @@ jobs:
 
 ## Use registered public SSH key(s)
 
-By default anybody can connect to the tmate session. You can opt-in to install the public SSH keys [that you have registered with your GitHub profile](https://docs.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account).
+By default only the user who has triggered the action can connect to the tmate session with [the SSH keys that are registered with the GitHub profile](https://docs.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account). You can opt-out of this by setting `limit-access-to-actor` to `false`
 
 ```yaml
 name: CI
@@ -139,7 +139,7 @@ jobs:
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
       with:
-        limit-access-to-actor: true
+        limit-access-to-actor: false
 ```
 
 If the registered public SSH key is not your default private SSH key, you will need to specify the path manually, like so: `ssh -i <path-to-key> <tmate-connection-string>`.
