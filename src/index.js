@@ -74,7 +74,7 @@ export async function run() {
     }
 
     let newSessionExtra = ""
-    if (core.getInput("limit-access-to-actor") === "true") {
+    if (core.getInput("limit-access-to-actor") !== "false") {
       const { actor } = github.context
       const octokit = new Octokit()
 
