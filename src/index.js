@@ -82,7 +82,7 @@ export async function run() {
         username: actor
       })
       if (keys.data.length === 0) {
-        throw new Error(`No public SSH keys registered with ${actor}'s GitHub profile`)
+        throw new Error(`No public SSH keys registered with ${actor}'s GitHub profile, add an SSH key (https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account) or set \`limit-access-to-actor: false\` to allow anyone to connect without authentication.`)
       }
       const sshPath = path.join(os.homedir(), ".ssh")
       await fs.promises.mkdir(sshPath, { recursive: true })
