@@ -59,6 +59,8 @@ jobs:
         limit-access-to-actor: true
 ```
 
+If the registered public SSH key is not your default private SSH key, you will need to specify the path manually, like so: `ssh -i <path-to-key> <tmate-connection-string>`.
+
 ## Manually triggered debug
 
 Instead of having to add/remove, or uncomment the required config and push commits each time you want to run your workflow with debug, you can make the debug step conditional on an optional parameter that you provide through a [`workflow_dispatch`](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) "manual event".
@@ -146,8 +148,6 @@ jobs:
       if: ${{ failure() }}
       uses: mxschmitt/action-tmate@v3
 ```
-
-If the registered public SSH key is not your default private SSH key, you will need to specify the path manually, like so: `ssh -i <path-to-key> <tmate-connection-string>`.
 
 ## Use your own tmate servers
 
