@@ -30,11 +30,34 @@ jobs:
     - uses: actions/checkout@v2
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
+      with:
+        limit-access-to-actor: true
 ```
 
 To get the connection string, just open the `Checks` tab in your Pull Request and scroll to the bottom. There you can connect either directly per SSH or via a web based terminal.
 
 ![GitHub Checks tab](./docs/checks-tab.png "GitHub Checks tab")
+
+## Security consideration: Use registered public SSH key(s)
+
+By default *anybody* can connect to the tmate session.
+This can lead to security issues, for example if secrets are available in environment variables or in subsequent steps privileged code is executed.
+You should opt-in to install the public SSH keys [that you have registered with your GitHub profile](https://docs.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account) to mitigate this risk.
+
+```yaml
+name: CI
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      with:
+        limit-access-to-actor: true
+```
 
 ## Manually triggered debug
 
@@ -122,24 +145,6 @@ jobs:
     - name: Setup tmate session
       if: ${{ failure() }}
       uses: mxschmitt/action-tmate@v3
-```
-
-## Use registered public SSH key(s)
-
-By default anybody can connect to the tmate session. You can opt-in to install the public SSH keys [that you have registered with your GitHub profile](https://docs.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account).
-
-```yaml
-name: CI
-on: [push]
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
-      with:
-        limit-access-to-actor: true
 ```
 
 If the registered public SSH key is not your default private SSH key, you will need to specify the path manually, like so: `ssh -i <path-to-key> <tmate-connection-string>`.
