@@ -42,7 +42,7 @@ To get the connection string, just open the `Checks` tab in your Pull Request an
 
 By default *anybody* can connect to the tmate session.
 This can lead to security issues, for example if secrets are available in environment variables or in subsequent steps privileged code is executed.
-You should opt-in to install the public SSH keys [that you have registered with your GitHub profile](https://docs.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account) to mitigate this risk.
+It is highly recommended to opt-in to install the public SSH keys [that you have registered with your GitHub profile](https://docs.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account) and to set `limit-access-to-actor: true` to mitigate this risk.
 
 ```yaml
 name: CI
@@ -59,7 +59,7 @@ jobs:
         limit-access-to-actor: true
 ```
 
-If the registered public SSH key is not your default private SSH key, you will need to specify the path manually, like so: `ssh -i <path-to-key> <tmate-connection-string>`.
+If the registered public SSH key is not your default private SSH key, you will need to specify the path manually, like so: `ssh -i <path-to-key> <tmate-connection-string>  even if the workflow run suggests the command without the `-i` option`.
 
 ## Manually triggered debug
 
