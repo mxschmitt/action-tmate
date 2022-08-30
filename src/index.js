@@ -139,16 +139,8 @@ export async function run() {
     if (core.getInput("wait") === "true") {
       await waitUntilDebuggingSessionExit()
     } else {
-      const tmate = getTmate();
-
-      core.debug("Fetching connection strings")
-      const tmateSSH = await execShellCommand(`${tmate} display -p '#{tmate_ssh}'`);
-      const tmateWeb = await execShellCommand(`${tmate} display -p '#{tmate_web}'`);
-
-      if (tmateWeb) {
-        core.info(`Web shell: ${tmateWeb}`);
-      }
-      core.info(`SSH: ${tmateSSH}`);
+      const [tmateSSH, tmateWeb] = await getTmateConnectionStrings()
+      showTmateConnectionStrings(tmateSSH, tmateWeb)
     }
   } catch (error) {
     core.setFailed(error);
@@ -156,18 +148,11 @@ export async function run() {
 }
 
 async function waitUntilDebuggingSessionExit() {
-  const tmate = getTmate();
-
-  core.debug("Fetching connection strings")
-  const tmateSSH = await execShellCommand(`${tmate} display -p '#{tmate_ssh}'`);
-  const tmateWeb = await execShellCommand(`${tmate} display -p '#{tmate_web}'`);
+  const [tmateSSH, tmateWeb] = await getTmateConnectionStrings()
 
   core.debug("Entering main loop")
   while (true) {
-    if (tmateWeb) {
-      core.info(`Web shell: ${tmateWeb}`);
-    }
-    core.info(`SSH: ${tmateSSH}`);
+    showTmateConnectionStrings(tmateSSH, tmateWeb);
 
     await sleep(5000)
 
@@ -186,6 +171,23 @@ async function waitUntilDebuggingSessionExit() {
       break
     }
   }
+}
+
+function showTmateConnectionStrings(tmateSSH, tmateWeb) {
+  if (tmateWeb) {
+    core.info(`Web shell: ${tmateWeb}`);
+  }
+  core.info(`SSH: ${tmateSSH}`);
+}
+
+async function getTmateConnectionStrings() {
+  const tmate = getTmate();
+
+  core.debug("Fetching connection strings")
+  const tmateSSH = await execShellCommand(`${tmate} display -p '#{tmate_ssh}'`);
+  const tmateWeb = await execShellCommand(`${tmate} display -p '#{tmate_web}'`);
+
+  return [tmateSSH, tmateWeb]
 }
 
 async function doesTmateHaveConnectedClients() {
