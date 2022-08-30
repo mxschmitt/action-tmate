@@ -136,37 +136,42 @@ export async function run() {
     await execShellCommand(`${tmate} wait tmate-ready`);
     core.debug("Created new session successfully")
 
-    core.debug("Fetching connection strings")
-    const tmateSSH = await execShellCommand(`${tmate} display -p '#{tmate_ssh}'`);
-    const tmateWeb = await execShellCommand(`${tmate} display -p '#{tmate_web}'`);
-
-    core.debug("Entering main loop")
-    while (true) {
-      if (tmateWeb) {
-        core.info(`Web shell: ${tmateWeb}`);
-      }
-      core.info(`SSH: ${tmateSSH}`);
-
-      await sleep(5000)
-
-      if (continueFileExists()) {
-        core.info("Exiting debugging session because the continue file was created")
-        break
-      }
-
-      if (didTmateQuit()) {
-        core.info("Exiting debugging session 'tmate' quit")
-        break
-      }
-
-      if (!(await doesTmateHaveConnectedClients())) {
-        core.info("Exiting debugging session because 'tmate' has no clients")
-        break
-      }
-    }
-
+    await waitUntilDebuggingSessionCanExit()
   } catch (error) {
     core.setFailed(error);
+  }
+}
+
+async function waitUntilDebuggingSessionCanExit() {
+  const tmate = getTmate();
+
+  core.debug("Fetching connection strings")
+  const tmateSSH = await execShellCommand(`${tmate} display -p '#{tmate_ssh}'`);
+  const tmateWeb = await execShellCommand(`${tmate} display -p '#{tmate_web}'`);
+
+  core.debug("Entering main loop")
+  while (true) {
+    if (tmateWeb) {
+      core.info(`Web shell: ${tmateWeb}`);
+    }
+    core.info(`SSH: ${tmateSSH}`);
+
+    await sleep(5000)
+
+    if (continueFileExists()) {
+      core.info("Exiting debugging session because the continue file was created")
+      break
+    }
+
+    if (didTmateQuit()) {
+      core.info("Exiting debugging session 'tmate' quit")
+      break
+    }
+
+    if (!(await doesTmateHaveConnectedClients())) {
+      core.info("Exiting debugging session because 'tmate' has no clients")
+      break
+    }
   }
 }
 
