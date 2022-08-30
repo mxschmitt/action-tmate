@@ -145,6 +145,8 @@ export async function run() {
       }
       core.info(`SSH: ${tmateSSH}`);
 
+      await sleep(5000)
+
       if (continueFileExists()) {
         core.info("Exiting debugging session because the continue file was created")
         break
@@ -155,12 +157,21 @@ export async function run() {
         break
       }
 
-      await sleep(5000)
+      if (!(await doesTmateHaveConnectedClients())) {
+        core.info("Exiting debugging session because 'tmate' has no clients")
+        break
+      }
     }
 
   } catch (error) {
     core.setFailed(error);
   }
+}
+
+async function doesTmateHaveConnectedClients() {
+  const tmate = `${getTmateExecutablePath()} -S ${getTmateSocketPath()}`;
+  const tmateNumClients = await execShellCommand(`${tmate} display -p '#{tmate_num_clients}' || echo '0'`);
+  return tmateNumClients !== '0'
 }
 
 function didTmateQuit() {
