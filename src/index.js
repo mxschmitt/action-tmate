@@ -38,6 +38,10 @@ function getTmateSocketPath() {
   return process.platform === "win32" ? "C:/msys64/tmp/tmate.sock" : "/tmp/tmate.sock"
 }
 
+function getTmate() {
+  return `${getTmateExecutablePath()} -S ${getTmateSocketPath()}`;
+}
+
 export async function run() {
   try {
     if (core.getInput("install-dependencies") !== "false") {
@@ -102,9 +106,7 @@ export async function run() {
       newSessionExtra = `-a "${authorizedKeysPath}"`
     }
 
-    const tmateExecutable = getTmateExecutablePath()
-    const tmateSocket = getTmateSocketPath()
-    const tmate = `${tmateExecutable} -S ${tmateSocket}`;
+    const tmate = getTmate()
 
     // Work around potential `set -e` commands in `~/.profile` (looking at you, `setup-miniconda`!)
     await execShellCommand(`echo 'set +e' >/tmp/tmate.bashrc`);
@@ -169,7 +171,7 @@ export async function run() {
 }
 
 async function doesTmateHaveConnectedClients() {
-  const tmate = `${getTmateExecutablePath()} -S ${getTmateSocketPath()}`;
+  const tmate = getTmate()
   const tmateNumClients = await execShellCommand(`${tmate} display -p '#{tmate_num_clients}' || echo '0'`);
   return tmateNumClients !== '0'
 }
