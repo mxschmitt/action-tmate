@@ -24,9 +24,22 @@ const TMATE_ARCH_MAP = {
 /** @param {number} ms */
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+function getTmateExecutablePath() {
+  if (process.platform === "win32") {
+    return "CHERE_INVOKING=1 tmate"
+  } else if (core.getInput("install-dependencies") !== "false" && process.platform !== "darwin") {
+    return path.join(path.join(os.tmpdir(), "tmate"), "tmate")
+  } else {
+    return "tmate"
+  }
+}
+
+function getTmateSocketPath() {
+  return process.platform === "win32" ? "C:/msys64/tmp/tmate.sock" : "/tmp/tmate.sock"
+}
+
 export async function run() {
   try {
-    let tmateExecutable = "tmate"
     if (core.getInput("install-dependencies") !== "false") {
       core.debug("Installing dependencies")
       if (process.platform === "darwin") {
@@ -50,8 +63,8 @@ export async function run() {
           throw new Error(`Unsupported architecture: ${os.arch()}`)
         }
         const tmateReleaseTar = await tc.downloadTool(`https://github.com/tmate-io/tmate/releases/download/${TMATE_LINUX_VERSION}/tmate-${TMATE_LINUX_VERSION}-static-linux-${tmateArch}.tar.xz`);
-        const tmateDir = path.join(os.tmpdir(), "tmate")
-        tmateExecutable = path.join(tmateDir, "tmate")
+        const tmateExecutable = getTmateExecutablePath()
+        const tmateDir = path.dirname(tmateExecutable)
 
         if (fs.existsSync(tmateExecutable))
           fs.unlinkSync(tmateExecutable)
@@ -62,9 +75,7 @@ export async function run() {
       core.debug("Installed dependencies successfully");
     }
 
-    if (process.platform === "win32") {
-      tmateExecutable = 'CHERE_INVOKING=1 tmate'
-    } else {
+    if (process.platform !== "win32") {
       core.debug("Generating SSH keys")
       fs.mkdirSync(path.join(os.homedir(), ".ssh"), { recursive: true })
       try {
@@ -91,7 +102,9 @@ export async function run() {
       newSessionExtra = `-a "${authorizedKeysPath}"`
     }
 
-    const tmate = `${tmateExecutable} -S /tmp/tmate.sock`;
+    const tmateExecutable = getTmateExecutablePath()
+    const tmateSocket = getTmateSocketPath()
+    const tmate = `${tmateExecutable} -S ${tmateSocket}`;
 
     // Work around potential `set -e` commands in `~/.profile` (looking at you, `setup-miniconda`!)
     await execShellCommand(`echo 'set +e' >/tmp/tmate.bashrc`);
@@ -151,8 +164,7 @@ export async function run() {
 }
 
 function didTmateQuit() {
-  const tmateSocketPath = process.platform === "win32" ? "C:/msys64/tmp/tmate.sock" : "/tmp/tmate.sock"
-  return !fs.existsSync(tmateSocketPath)
+  return !fs.existsSync(getTmateSocketPath())
 }
 
 function continueFileExists() {

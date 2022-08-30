@@ -6,6 +6,7 @@ author: 'Max Schmitt'
 runs:
   using: 'node16'
   main: 'lib/index.js'
+  post: 'lib/post.js'
 inputs:
   sudo:
     description: 'If apt should be executed with sudo or without'
