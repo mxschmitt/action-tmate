@@ -36,3 +36,11 @@ inputs:
     description: 'The ed25519 fingerprint for your tmate server'
     required: false
     default: ''
+  check-num-clients:
+    description: 'Whether or not to exit if number of connected clients is 0'
+    required: false
+    default: 'false'
+  wait:
+    description: 'Whether or not to wait until debugging session exit'
+    required: false
+    default: 'true'

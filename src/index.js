@@ -136,13 +136,26 @@ export async function run() {
     await execShellCommand(`${tmate} wait tmate-ready`);
     core.debug("Created new session successfully")
 
-    await waitUntilDebuggingSessionCanExit()
+    if (core.getInput("wait") === "true") {
+      await waitUntilDebuggingSessionExit()
+    } else {
+      const tmate = getTmate();
+
+      core.debug("Fetching connection strings")
+      const tmateSSH = await execShellCommand(`${tmate} display -p '#{tmate_ssh}'`);
+      const tmateWeb = await execShellCommand(`${tmate} display -p '#{tmate_web}'`);
+
+      if (tmateWeb) {
+        core.info(`Web shell: ${tmateWeb}`);
+      }
+      core.info(`SSH: ${tmateSSH}`);
+    }
   } catch (error) {
     core.setFailed(error);
   }
 }
 
-async function waitUntilDebuggingSessionCanExit() {
+async function waitUntilDebuggingSessionExit() {
   const tmate = getTmate();
 
   core.debug("Fetching connection strings")
@@ -168,7 +181,7 @@ async function waitUntilDebuggingSessionCanExit() {
       break
     }
 
-    if (!(await doesTmateHaveConnectedClients())) {
+    if (core.getInput("check-num-clients") !== "false" && !(await doesTmateHaveConnectedClients())) {
       core.info("Exiting debugging session because 'tmate' has no clients")
       break
     }
