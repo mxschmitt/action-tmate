@@ -5,7 +5,7 @@ branding:
 author: 'Max Schmitt'
 runs:
   using: 'node16'
-  main: 'lib/index.js'
+  main: 'lib/main.js'
   post: 'lib/post.js'
 inputs:
   sudo:
@@ -40,7 +40,7 @@ inputs:
     description: 'Whether or not to exit if number of connected clients is 0'
     required: false
     default: 'false'
-  wait:
-    description: 'Whether or not to wait until debugging session exit'
+  wait-in-post:
+    description: 'Whether or not to wait until debugging session exit in post (rather than at the end of action execution)'
     required: false
-    default: 'true'
+    default: 'false'
