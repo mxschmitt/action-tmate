@@ -1,6 +1,7 @@
 // @ts-check
 import { spawn } from 'child_process'
 import * as core from "@actions/core"
+import * as helpers from './helpers'
 import os from "os"
 import fs from 'fs'
 import path from "path"
@@ -96,8 +97,6 @@ export async function waitUntilDebuggingSessionExit() {
   while (true) {
     showTmateConnectionStrings(tmateSSH, tmateWeb);
 
-    await sleep(5000)
-
     if (continueFileExists()) {
       core.info("Exiting debugging session because the continue file was created")
       break
@@ -107,6 +106,8 @@ export async function waitUntilDebuggingSessionExit() {
       core.info("Exiting debugging session 'tmate' quit")
       break
     }
+
+    await sleep(5000)
 
     if (core.getInput("check-num-clients") !== "false" && !(await doesTmateHaveConnectedClients())) {
       core.info("Exiting debugging session because 'tmate' has no clients")
@@ -126,15 +127,15 @@ export async function getTmateConnectionStrings() {
   const tmate = getTmate();
 
   core.debug("Fetching connection strings")
-  const tmateSSH = await execShellCommand(`${tmate} display -p '#{tmate_ssh}'`);
-  const tmateWeb = await execShellCommand(`${tmate} display -p '#{tmate_web}'`);
+  const tmateSSH = await helpers.execShellCommand(`${tmate} display -p '#{tmate_ssh}'`);
+  const tmateWeb = await helpers.execShellCommand(`${tmate} display -p '#{tmate_web}'`);
 
   return [tmateSSH, tmateWeb]
 }
 
 async function doesTmateHaveConnectedClients() {
   const tmate = getTmate()
-  const tmateNumClients = await execShellCommand(`${tmate} display -p '#{tmate_num_clients}' || echo '0'`);
+  const tmateNumClients = await helpers.execShellCommand(`${tmate} display -p '#{tmate_num_clients}' || echo '0'`);
   return tmateNumClients !== '0'
 }
 
