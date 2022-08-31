@@ -1,15 +1,24 @@
 // @ts-check
-import os from "os"
-import fs from "fs"
-import path from "path"
-import * as core from "@actions/core"
-import * as github from "@actions/github"
-import * as tc from "@actions/tool-cache"
-import { Octokit } from "@octokit/rest"
+import os from "os";
+import fs from "fs";
+import path from "path";
+import * as core from "@actions/core";
+import * as github from "@actions/github";
+import * as tc from "@actions/tool-cache";
+import { Octokit } from "@octokit/rest";
 
-import { execShellCommand, getValidatedInput, getLinuxDistro, getTmateExecutablePath, getTmate, getTmateConnectionStrings, showTmateConnectionStrings, waitUntilDebuggingSessionExit } from "./helpers"
+import {
+  execShellCommand,
+  getValidatedInput,
+  getLinuxDistro,
+  getTmateExecutablePath,
+  getTmate,
+  getTmateConnectionStrings,
+  showTmateConnectionStrings,
+  waitUntilDebuggingSessionExit,
+} from "./helpers";
 
-const TMATE_LINUX_VERSION = "2.4.0"
+const TMATE_LINUX_VERSION = "2.4.0";
 
 // Map os.arch() values to the architectures in tmate release binary filenames.
 // Possible os.arch() values documented here:
@@ -17,75 +26,90 @@ const TMATE_LINUX_VERSION = "2.4.0"
 // Available tmate binaries listed here:
 // https://github.com/tmate-io/tmate/releases/
 const TMATE_ARCH_MAP = {
-  arm64: 'arm64v8',
-  x64: 'amd64',
+  arm64: "arm64v8",
+  x64: "amd64",
 };
 
 export async function run() {
   try {
     if (core.getInput("install-dependencies") !== "false") {
-      core.debug("Installing dependencies")
+      core.debug("Installing dependencies");
       if (process.platform === "darwin") {
-        await execShellCommand('brew install tmate');
+        await execShellCommand("brew install tmate");
       } else if (process.platform === "win32") {
-        await execShellCommand('pacman -Sy --noconfirm tmate');
+        await execShellCommand("pacman -Sy --noconfirm tmate");
       } else {
-        const optionalSudoPrefix = core.getInput("sudo") === "true" ? "sudo " : "";
+        const optionalSudoPrefix =
+          core.getInput("sudo") === "true" ? "sudo " : "";
         const distro = await getLinuxDistro();
         core.debug("linux distro: [" + distro + "]");
         if (distro === "alpine") {
           // for set -e workaround, we need to install bash because alpine doesn't have it
-          await execShellCommand(optionalSudoPrefix + 'apk add openssh-client xz bash');
+          await execShellCommand(
+            optionalSudoPrefix + "apk add openssh-client xz bash"
+          );
         } else {
-          await execShellCommand(optionalSudoPrefix + 'apt-get update');
-          await execShellCommand(optionalSudoPrefix + 'apt-get install -y openssh-client xz-utils');
+          await execShellCommand(optionalSudoPrefix + "apt-get update");
+          await execShellCommand(
+            optionalSudoPrefix + "apt-get install -y openssh-client xz-utils"
+          );
         }
 
         const tmateArch = TMATE_ARCH_MAP[os.arch()];
         if (!tmateArch) {
-          throw new Error(`Unsupported architecture: ${os.arch()}`)
+          throw new Error(`Unsupported architecture: ${os.arch()}`);
         }
-        const tmateReleaseTar = await tc.downloadTool(`https://github.com/tmate-io/tmate/releases/download/${TMATE_LINUX_VERSION}/tmate-${TMATE_LINUX_VERSION}-static-linux-${tmateArch}.tar.xz`);
-        const tmateExecutable = getTmateExecutablePath()
-        const tmateDir = path.dirname(tmateExecutable)
+        const tmateReleaseTar = await tc.downloadTool(
+          `https://github.com/tmate-io/tmate/releases/download/${TMATE_LINUX_VERSION}/tmate-${TMATE_LINUX_VERSION}-static-linux-${tmateArch}.tar.xz`
+        );
+        const tmateExecutable = getTmateExecutablePath();
+        const tmateDir = path.dirname(tmateExecutable);
 
-        if (fs.existsSync(tmateExecutable))
-          fs.unlinkSync(tmateExecutable)
-        fs.mkdirSync(tmateDir, { recursive: true })
-        await execShellCommand(`tar x -C ${tmateDir} -f ${tmateReleaseTar} --strip-components=1`)
-        fs.unlinkSync(tmateReleaseTar)
+        if (fs.existsSync(tmateExecutable)) fs.unlinkSync(tmateExecutable);
+        fs.mkdirSync(tmateDir, { recursive: true });
+        await execShellCommand(
+          `tar x -C ${tmateDir} -f ${tmateReleaseTar} --strip-components=1`
+        );
+        fs.unlinkSync(tmateReleaseTar);
       }
       core.debug("Installed dependencies successfully");
     }
 
     if (process.platform !== "win32") {
-      core.debug("Generating SSH keys")
-      fs.mkdirSync(path.join(os.homedir(), ".ssh"), { recursive: true })
+      core.debug("Generating SSH keys");
+      fs.mkdirSync(path.join(os.homedir(), ".ssh"), { recursive: true });
       try {
-        await execShellCommand(`echo -e 'y\n'|ssh-keygen -q -t rsa -N "" -f ~/.ssh/id_rsa`);
-      } catch { }
-      core.debug("Generated SSH-Key successfully")
+        await execShellCommand(
+          `echo -e 'y\n'|ssh-keygen -q -t rsa -N "" -f ~/.ssh/id_rsa`
+        );
+      } catch {}
+      core.debug("Generated SSH-Key successfully");
     }
 
-    let newSessionExtra = ""
+    let newSessionExtra = "";
     if (core.getInput("limit-access-to-actor") === "true") {
-      const { actor } = github.context
-      const octokit = new Octokit()
+      const { actor } = github.context;
+      const octokit = new Octokit();
 
       const keys = await octokit.users.listPublicKeysForUser({
-        username: actor
-      })
+        username: actor,
+      });
       if (keys.data.length === 0) {
-        throw new Error(`No public SSH keys registered with ${actor}'s GitHub profile`)
+        throw new Error(
+          `No public SSH keys registered with ${actor}'s GitHub profile`
+        );
       }
-      const sshPath = path.join(os.homedir(), ".ssh")
-      await fs.promises.mkdir(sshPath, { recursive: true })
-      const authorizedKeysPath = path.join(sshPath, "authorized_keys")
-      await fs.promises.writeFile(authorizedKeysPath, keys.data.map(e => e.key).join('\n'))
-      newSessionExtra = `-a "${authorizedKeysPath}"`
+      const sshPath = path.join(os.homedir(), ".ssh");
+      await fs.promises.mkdir(sshPath, { recursive: true });
+      const authorizedKeysPath = path.join(sshPath, "authorized_keys");
+      await fs.promises.writeFile(
+        authorizedKeysPath,
+        keys.data.map((e) => e.key).join("\n")
+      );
+      newSessionExtra = `-a "${authorizedKeysPath}"`;
     }
 
-    const tmate = getTmate()
+    const tmate = getTmate();
 
     // Work around potential `set -e` commands in `~/.profile` (looking at you, `setup-miniconda`!)
     await execShellCommand(`echo 'set +e' >/tmp/tmate.bashrc`);
@@ -99,27 +123,28 @@ export async function run() {
       "tmate-server-port": /^\d{1,5}$/,
       "tmate-server-rsa-fingerprint": /./,
       "tmate-server-ed25519-fingerprint": /./,
-    }
+    };
 
     for (const [key, option] of Object.entries(options)) {
-      if (core.getInput(key) === '')
-        continue;
+      if (core.getInput(key) === "") continue;
       const value = getValidatedInput(key, option);
       if (value !== undefined) {
         setDefaultCommand = `${setDefaultCommand} set-option -g ${key} "${value}" \\;`;
       }
     }
 
-    core.debug("Creating new session")
-    await execShellCommand(`${tmate} ${newSessionExtra} ${setDefaultCommand} new-session -d`);
+    core.debug("Creating new session");
+    await execShellCommand(
+      `${tmate} ${newSessionExtra} ${setDefaultCommand} new-session -d`
+    );
     await execShellCommand(`${tmate} wait tmate-ready`);
-    core.debug("Created new session successfully")
+    core.debug("Created new session successfully");
 
     if (core.getInput("wait-in-post") !== "false") {
-      const [tmateSSH, tmateWeb] = await getTmateConnectionStrings()
-      showTmateConnectionStrings(tmateSSH, tmateWeb)
+      const [tmateSSH, tmateWeb] = await getTmateConnectionStrings();
+      showTmateConnectionStrings(tmateSSH, tmateWeb);
     } else {
-      await waitUntilDebuggingSessionExit()
+      await waitUntilDebuggingSessionExit();
     }
   } catch (error) {
     core.setFailed(error);
