@@ -1,3 +1,5 @@
 import { waitUntilDebuggingSessionExit } from "./helpers";
 
-waitUntilDebuggingSessionExit()
+if (core.getInput("wait-in-post") !== "false") {
+  waitUntilDebuggingSessionExit()
+}
