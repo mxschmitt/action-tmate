@@ -36,11 +36,15 @@ inputs:
     description: 'The ed25519 fingerprint for your tmate server'
     required: false
     default: ''
+  continue:
+    description: 'Whether to continue immediately after establishing a debugging session'
+    required: false
+    default: 'false'
   check-num-clients:
     description: 'Whether or not to exit if number of connected clients is 0'
     required: false
     default: 'false'
   wait-in-post:
-    description: 'Whether or not to wait until debugging session exit in post (rather than at the end of action execution)'
+    description: 'Whether or not to wait until debugging session exit in post'
     required: false
     default: 'false'

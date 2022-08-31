@@ -140,7 +140,7 @@ export async function run() {
     await execShellCommand(`${tmate} wait tmate-ready`);
     core.debug("Created new session successfully");
 
-    if (core.getInput("wait-in-post") !== "false") {
+    if (core.getInput("continue") !== "false") {
       const [tmateSSH, tmateWeb] = await getTmateConnectionStrings();
       showTmateConnectionStrings(tmateSSH, tmateWeb);
     } else {

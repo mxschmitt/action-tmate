@@ -45,7 +45,7 @@ describe("Tmate GitHub integration", () => {
     mockCoreGetInputImplementation({
       "install-dependencies": "true",
       "limit-access-to-actor": "false",
-      "wait-in-post": "false",
+      continue: "false",
     });
     await run();
     expect(execShellCommand).toHaveBeenNthCalledWith(
@@ -72,7 +72,7 @@ describe("Tmate GitHub integration", () => {
     mockCoreGetInputImplementation({
       "install-dependencies": "false",
       "limit-access-to-actor": "false",
-      "wait-in-post": "false",
+      continue: "false",
     });
     await run();
     expect(execShellCommand).not.toHaveBeenNthCalledWith(
@@ -99,7 +99,7 @@ describe("Tmate GitHub integration", () => {
     mockCoreGetInputImplementation({
       "install-dependencies": "true",
       "limit-access-to-actor": "false",
-      "wait-in-post": "false",
+      continue: "false",
       sudo: "true",
     });
     await run();
@@ -124,7 +124,7 @@ describe("Tmate GitHub integration", () => {
     mockCoreGetInputImplementation({
       "install-dependencies": "true",
       "limit-access-to-actor": "false",
-      "wait-in-post": "false",
+      continue: "false",
       sudo: "false",
     });
     await run();
@@ -149,7 +149,7 @@ describe("Tmate GitHub integration", () => {
     mockCoreGetInputImplementation({
       "install-dependencies": "false",
       "limit-access-to-actor": "false",
-      "wait-in-post": "false",
+      continue: "false",
     });
     await run();
     expect(execShellCommand).not.toHaveBeenNthCalledWith(1, "apt-get update");
@@ -173,7 +173,7 @@ describe("Tmate GitHub integration", () => {
     mockCoreGetInputImplementation({
       "install-dependencies": "true",
       "limit-access-to-actor": "false",
-      "wait-in-post": "false",
+      continue: "false",
     });
     await run();
     expect(core.getInput).toHaveBeenNthCalledWith(1, "install-dependencies");
@@ -186,7 +186,7 @@ describe("Tmate GitHub integration", () => {
     mockCoreGetInputImplementation({
       "install-dependencies": "false",
       "limit-access-to-actor": "false",
-      "wait-in-post": "false",
+      continue: "false",
     });
     await run();
     expect(execShellCommand).not.toHaveBeenNthCalledWith(
