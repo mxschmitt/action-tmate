@@ -57,9 +57,7 @@ export const getValidatedInput = (key, re) => {
   return value;
 };
 
-/**
- * @return {Promise<string>}
- */
+/** @return {Promise<string>} */
 export const getLinuxDistro = async () => {
   try {
     const osRelease = await fs.promises.readFile("/etc/os-release");
@@ -73,6 +71,7 @@ export const getLinuxDistro = async () => {
 /** @param {number} ms */
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/** @return {string} */
 export function getTmateExecutablePath() {
   if (process.platform === "win32") {
     return "CHERE_INVOKING=1 tmate";
@@ -86,12 +85,14 @@ export function getTmateExecutablePath() {
   }
 }
 
+/** @return {string} */
 function getTmateSocketPath() {
   return process.platform === "win32"
     ? "C:/msys64/tmp/tmate.sock"
     : "/tmp/tmate.sock";
 }
 
+/** @return {string} */
 export function getTmate() {
   return `${getTmateExecutablePath()} -S ${getTmateSocketPath()}`;
 }
@@ -134,6 +135,7 @@ export function showTmateConnectionStrings(tmateSSH, tmateWeb) {
   core.info(`SSH: ${tmateSSH}`);
 }
 
+/** @return {Promise<[string, string]>} */
 export async function getTmateConnectionStrings() {
   const tmate = getTmate();
 
@@ -148,6 +150,7 @@ export async function getTmateConnectionStrings() {
   return [tmateSSH, tmateWeb];
 }
 
+/** @return {Promise<boolean>} */
 async function doesTmateHaveConnectedClients() {
   const tmate = getTmate();
   const tmateNumClients = await helpers.execShellCommand(
@@ -156,10 +159,12 @@ async function doesTmateHaveConnectedClients() {
   return tmateNumClients !== "0";
 }
 
+/**  @return {boolean} */
 function didTmateQuit() {
   return !fs.existsSync(getTmateSocketPath());
 }
 
+/** @return {boolean} */
 function continueFileExists() {
   const continuePath =
     process.platform === "win32" ? "C:/msys64/continue" : "/continue";
