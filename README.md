@@ -199,16 +199,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
       if: runner.debug == '1'
       with:
         check-num-clients: true
-        limit-access-to-actor: true
+        limit-access-to-actor: true # requires registered public SSH key(s)
         wait: false
         wait-in-post: true
-        wait-interval: '600000'
+        wait-interval: '600000' # 10 minutes
+    - uses: actions/checkout@v2
 ```
 
 ## Continue a workflow
