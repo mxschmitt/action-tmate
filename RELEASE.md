@@ -2,7 +2,7 @@
 
 ## Packaging
 
-The GitHub Action relies on `lib/index.js` as the entrypoint. This entrypoint needs to be committed after every change. Use the following command to package the code into `lib/index.js`.
+The GitHub Action relies on `lib/main.js` as the main entrypoint and `lib/post.js` as the post entrypoint. This entrypoints need to be committed after every change. Use the following command to package the code into `lib/*.js`.
 
 ```txt
 npm run build
