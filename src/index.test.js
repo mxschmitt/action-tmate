@@ -22,6 +22,12 @@ jest.mock('./helpers', () => {
 import { execShellCommand } from "./helpers"
 import { run } from "."
 
+function mockCoreGetInputImplementation(inputs) {
+  core.getInput.mockImplementation((input) => inputs[input] || '');
+}
+
+const customConnectionString = "mocked execShellCommand"
+
 describe('Tmate GitHub integration', () => {
   const originalPlatform = process.platform;
 
@@ -35,9 +41,8 @@ describe('Tmate GitHub integration', () => {
     Object.defineProperty(process, "platform", {
       value: "win32"
     })
-    core.getInput.mockReturnValueOnce("true").mockReturnValueOnce("false")
-    const customConnectionString = "foobar"
-    execShellCommand.mockReturnValue(Promise.resolve(customConnectionString))
+
+    mockCoreGetInputImplementation({"install-dependencies": "true", "limit-access-to-actor": "false", "wait-in-post": "false"});
     await run()
     expect(execShellCommand).toHaveBeenNthCalledWith(1, "pacman -Sy --noconfirm tmate");
     expect(core.info).toHaveBeenNthCalledWith(1, `Web shell: ${customConnectionString}`);
@@ -48,9 +53,7 @@ describe('Tmate GitHub integration', () => {
     Object.defineProperty(process, "platform", {
       value: "win32"
     })
-    core.getInput.mockReturnValueOnce("false")
-    const customConnectionString = "foobar"
-    execShellCommand.mockReturnValue(Promise.resolve(customConnectionString))
+    mockCoreGetInputImplementation({"install-dependencies": "false", "limit-access-to-actor": "false", "wait-in-post": "false"});
     await run()
     expect(execShellCommand).not.toHaveBeenNthCalledWith(1, "pacman -Sy --noconfirm tmate");
     expect(core.info).toHaveBeenNthCalledWith(1, `Web shell: ${customConnectionString}`);
@@ -61,9 +64,7 @@ describe('Tmate GitHub integration', () => {
     Object.defineProperty(process, "platform", {
       value: "linux"
     })
-    core.getInput.mockReturnValueOnce("true").mockReturnValueOnce("true").mockReturnValueOnce("false")
-    const customConnectionString = "foobar"
-    execShellCommand.mockReturnValue(Promise.resolve(customConnectionString))
+    mockCoreGetInputImplementation({"install-dependencies": "true", "limit-access-to-actor": "false", "wait-in-post": "false", "sudo": "true"});
     await run()
     expect(execShellCommand).toHaveBeenNthCalledWith(1, "sudo apt-get update")
     expect(core.info).toHaveBeenNthCalledWith(1, `Web shell: ${customConnectionString}`);
@@ -74,9 +75,7 @@ describe('Tmate GitHub integration', () => {
     Object.defineProperty(process, "platform", {
       value: "linux"
     })
-    core.getInput.mockReturnValueOnce("true").mockReturnValueOnce("false").mockReturnValueOnce("false")
-    const customConnectionString = "foobar"
-    execShellCommand.mockReturnValue(Promise.resolve(customConnectionString))
+    mockCoreGetInputImplementation({"install-dependencies": "true", "limit-access-to-actor": "false", "wait-in-post": "false", "sudo": "false"});
     await run()
     expect(execShellCommand).toHaveBeenNthCalledWith(1, "apt-get update")
     expect(core.info).toHaveBeenNthCalledWith(1, `Web shell: ${customConnectionString}`);
@@ -87,9 +86,7 @@ describe('Tmate GitHub integration', () => {
     Object.defineProperty(process, "platform", {
       value: "linux"
     })
-    core.getInput.mockReturnValueOnce("false").mockReturnValueOnce("false")
-    const customConnectionString = "foobar"
-    execShellCommand.mockReturnValue(Promise.resolve(customConnectionString))
+    mockCoreGetInputImplementation({"install-dependencies": "false", "limit-access-to-actor": "false", "wait-in-post": "false"});
     await run()
     expect(execShellCommand).not.toHaveBeenNthCalledWith(1, "apt-get update")
     expect(core.info).toHaveBeenNthCalledWith(1, `Web shell: ${customConnectionString}`);
@@ -100,7 +97,7 @@ describe('Tmate GitHub integration', () => {
     Object.defineProperty(process, "platform", {
       value: "darwin"
     })
-    core.getInput.mockReturnValueOnce("true")
+    mockCoreGetInputImplementation({"install-dependencies": "true", "limit-access-to-actor": "false", "wait-in-post": "false"});
     await run()
     expect(core.getInput).toHaveBeenNthCalledWith(1, "install-dependencies")
     expect(execShellCommand).toHaveBeenNthCalledWith(1, "brew install tmate")
@@ -109,7 +106,7 @@ describe('Tmate GitHub integration', () => {
     Object.defineProperty(process, "platform", {
       value: "darwin"
     })
-    core.getInput.mockReturnValueOnce("false")
+    mockCoreGetInputImplementation({"install-dependencies": "false", "limit-access-to-actor": "false", "wait-in-post": "false"});
     await run()
     expect(execShellCommand).not.toHaveBeenNthCalledWith(1, "brew install tmate")
   });
@@ -122,14 +119,11 @@ describe('Tmate GitHub integration', () => {
   });
   it('should validate correct tmate options', async () => {
     // Check for the happy path first.
-    core.getInput.mockImplementation(function(opt) {
-        switch (opt) {
-          case "tmate-server-host": return "ssh.tmate.io";
-          case "tmate-server-port": return "22";
-          case "tmate-server-rsa-fingerprint": return "SHA256:Hthk2T/M/Ivqfk1YYUn5ijC2Att3+UPzD7Rn72P5VWs";
-          case "tmate-server-ed25519-fingerprint": return "SHA256:jfttvoypkHiQYUqUCwKeqd9d1fJj/ZiQlFOHVl6E9sI";
-          default: return "";
-        }
+    mockCoreGetInputImplementation({
+      "tmate-server-host": "ssh.tmate.io",
+      "tmate-server-port": "22",
+      "tmate-server-rsa-fingerprint": "SHA256:Hthk2T/M/Ivqfk1YYUn5ijC2Att3+UPzD7Rn72P5VWs",
+      "tmate-server-ed25519-fingerprint": "SHA256:jfttvoypkHiQYUqUCwKeqd9d1fJj/ZiQlFOHVl6E9sI"
     })
 
     await run()
@@ -152,12 +146,7 @@ describe('Tmate GitHub integration', () => {
     expect(match[1]).toEqual("ssh.tmate.io");
   });
   it('should fail to validate wrong tmate options', async () => {
-    core.getInput.mockImplementation(function(opt) {
-        switch (opt) {
-          case "tmate-server-host": return "not/a/valid/hostname";
-          default: return "";
-        }
-    })
+    mockCoreGetInputImplementation({"tmate-server-host": "not/a/valid/hostname"})
 
     await run()
 
