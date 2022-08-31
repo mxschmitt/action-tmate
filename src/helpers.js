@@ -116,7 +116,7 @@ export async function waitUntilDebuggingSessionExit() {
       break;
     }
 
-    await sleep(5000);
+    await sleep(parseInt(core.getInput("wait-interval")));
 
     if (
       core.getInput("check-num-clients") !== "false" &&
