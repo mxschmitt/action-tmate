@@ -40,10 +40,10 @@ export async function run() {
         if (distro === "alpine") {
           // for set -e workaround, we need to install bash because alpine doesn't have it
           await execShellCommand(optionalSudoPrefix + 'apk add openssh-client xz bash');
-        }else if (distro === "arch") {
+        } else if (distro === "arch") {
           // partial upgrades are not supported so also upgrade everything
           await execShellCommand(optionalSudoPrefix + 'pacman -Syu --noconfirm xz openssh');
-        }else if (distro === "fedora") {
+        } else if (distro === "fedora") {
           await execShellCommand(optionalSudoPrefix + 'dnf install -y xz openssh');
         } else {
           await execShellCommand(optionalSudoPrefix + 'apt-get update');
