@@ -2,6 +2,27 @@
 import { spawn } from 'child_process'
 import * as core from "@actions/core"
 import fs from 'fs'
+import os from 'os'
+
+/**
+ * @returns {string}
+ */
+export const getOptionalSudoPrefix = () => {
+  switch(core.getInput("sudo")){
+    case "true":{
+      return "sudo ";
+    }
+    case "detect":{
+      return os.userInfo().uid == 0 ? "" : "sudo ";
+    }
+    case "false":{
+      return "";
+    }
+    default:{
+      throw new Error(`Unsupported 'sudo' value: ${core.getInput("sudo")}`);
+    }
+  }
+}
 
 /**
  * @param {string} cmd

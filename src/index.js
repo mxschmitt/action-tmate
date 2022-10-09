@@ -7,7 +7,7 @@ import * as github from "@actions/github"
 import * as tc from "@actions/tool-cache"
 import { Octokit } from "@octokit/rest"
 
-import { execShellCommand, getValidatedInput, getLinuxDistro } from "./helpers"
+import { execShellCommand, getValidatedInput, getLinuxDistro, getOptionalSudoPrefix } from "./helpers"
 
 const TMATE_LINUX_VERSION = "2.4.0"
 
@@ -34,7 +34,7 @@ export async function run() {
       } else if (process.platform === "win32") {
         await execShellCommand('pacman -Sy --noconfirm tmate');
       } else {
-        const optionalSudoPrefix = core.getInput("sudo") === "true" ? "sudo " : "";
+        const optionalSudoPrefix = getOptionalSudoPrefix();
         const distro = await getLinuxDistro();
         core.debug("linux distro: [" + distro + "]");
         if (distro === "alpine") {
