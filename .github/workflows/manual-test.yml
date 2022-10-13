@@ -22,3 +22,23 @@ jobs:
       - uses: ./
         with:
           limit-access-to-actor: ${{ matrix.limit-access-to-actor }}
+  test-container:
+    strategy:
+      fail-fast: false
+      matrix:
+        container-runs-on:
+          - fedora:latest
+          - archlinux:latest
+          - ubuntu:latest
+        limit-access-to-actor:
+          - true
+          - false
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.container-runs-on }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        with:
+          limit-access-to-actor: ${{ matrix.limit-access-to-actor }}
+          sudo: false
