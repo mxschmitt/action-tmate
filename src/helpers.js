@@ -12,7 +12,7 @@ export const getOptionalSudoPrefix = () => {
     case "true":{
       return "sudo ";
     }
-    case "detect":{
+    case "auto":{
       return os.userInfo().uid == 0 ? "" : "sudo ";
     }
     case "false":{
