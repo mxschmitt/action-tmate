@@ -5,23 +5,11 @@ import fs from 'fs'
 import os from 'os'
 
 /**
- * @returns {string}
+ * @returns {boolean}
  */
-export const getOptionalSudoPrefix = () => {
-  switch(core.getInput("sudo")){
-    case "true":{
-      return "sudo ";
-    }
-    case "auto":{
-      return os.userInfo().uid == 0 ? "" : "sudo ";
-    }
-    case "false":{
-      return "";
-    }
-    default:{
-      throw new Error(`Unsupported 'sudo' value: ${core.getInput("sudo")}`);
-    }
-  }
+export const useSudoPrefix = () => {
+  const input = core.getInput("sudo");
+  return input === "auto" ? os.userInfo().uid !== 0 : input === "true";
 }
 
 /**
