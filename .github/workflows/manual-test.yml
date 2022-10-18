@@ -41,4 +41,3 @@ jobs:
       - uses: ./
         with:
           limit-access-to-actor: ${{ matrix.limit-access-to-actor }}
-          sudo: false

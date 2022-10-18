@@ -2,6 +2,15 @@
 import { spawn } from 'child_process'
 import * as core from "@actions/core"
 import fs from 'fs'
+import os from 'os'
+
+/**
+ * @returns {boolean}
+ */
+export const useSudoPrefix = () => {
+  const input = core.getInput("sudo");
+  return input === "auto" ? os.userInfo().uid !== 0 : input === "true";
+}
 
 /**
  * @param {string} cmd
