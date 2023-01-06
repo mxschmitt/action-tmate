@@ -80,9 +80,9 @@ export async function run() {
 
     let newSessionExtra = ""
     if (core.getInput("limit-access-to-actor") === "true") {
-      const { actor } = github.context
+      const { actor, apiUrl } = github.context
       const auth = core.getInput('github-token')
-      const octokit = new Octokit({ auth })
+      const octokit = new Octokit({ auth, baseUrl: apiUrl })
 
       const keys = await octokit.users.listPublicKeysForUser({
         username: actor
