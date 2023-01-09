@@ -32,7 +32,7 @@ export async function run() {
       if (process.platform === "darwin") {
         await execShellCommand('brew install tmate');
       } else if (process.platform === "win32") {
-        await execShellCommand('pacman -Sy --noconfirm tmate');
+        await execShellCommand('pacman -S --noconfirm tmate');
       } else {
         const optionalSudoPrefix = useSudoPrefix() ? "sudo " : "";
         const distro = await getLinuxDistro();
