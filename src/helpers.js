@@ -20,7 +20,13 @@ export const execShellCommand = (cmd) => {
   core.debug(`Executing shell command: [${cmd}]`)
   return new Promise((resolve, reject) => {
     const proc = process.platform !== "win32" ?
-      spawn(cmd, [], { shell: true }) :
+      spawn(cmd, [], {
+        shell: true,
+        env: {
+          ...process.env,
+          HOMEBREW_GITHUB_API_TOKEN: core.getInput('github-token') || undefined
+        }
+      }) :
       spawn("C:\\msys64\\usr\\bin\\bash.exe", ["-lc", cmd], {
         env: {
           ...process.env,
