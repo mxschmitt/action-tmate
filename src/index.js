@@ -79,7 +79,8 @@ export async function run() {
     }
 
     let newSessionExtra = ""
-    if (core.getInput("limit-access-to-actor") === "true") {
+    const limitAccessToActor = core.getInput("limit-access-to-actor")
+    if (limitAccessToActor === "true" || limitAccessToActor === "auto") {
       const { actor, apiUrl } = github.context
       const auth = core.getInput('github-token')
       const octokit = new Octokit({ auth, baseUrl: apiUrl })
@@ -88,13 +89,15 @@ export async function run() {
         username: actor
       })
       if (keys.data.length === 0) {
-        throw new Error(`No public SSH keys registered with ${actor}'s GitHub profile`)
+        if (limitAccessToActor === "auto") core.info(`No public SSH keys found for ${actor}; continuing without them`)
+        else throw new Error(`No public SSH keys registered with ${actor}'s GitHub profile`)
+      } else {
+        const sshPath = path.join(os.homedir(), ".ssh")
+        await fs.promises.mkdir(sshPath, { recursive: true })
+        const authorizedKeysPath = path.join(sshPath, "authorized_keys")
+        await fs.promises.writeFile(authorizedKeysPath, keys.data.map(e => e.key).join('\n'))
+        newSessionExtra = `-a "${authorizedKeysPath}"`
       }
-      const sshPath = path.join(os.homedir(), ".ssh")
-      await fs.promises.mkdir(sshPath, { recursive: true })
-      const authorizedKeysPath = path.join(sshPath, "authorized_keys")
-      await fs.promises.writeFile(authorizedKeysPath, keys.data.map(e => e.key).join('\n'))
-      newSessionExtra = `-a "${authorizedKeysPath}"`
     }
 
     const tmate = `${tmateExecutable} -S /tmp/tmate.sock`;

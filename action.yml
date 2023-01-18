@@ -16,9 +16,9 @@ inputs:
     required: false
     default: 'true'
   limit-access-to-actor:
-    description: 'If only the public SSH keys of the user triggering the workflow should be authorized'
+    description: 'Whether to authorize only the public SSH keys of the user triggering the workflow (defaults to true if the GitHub profile of the user has a public SSH key)'
     required: false
-    default: 'false'
+    default: 'auto'
   tmate-server-host:
     description: 'The hostname for your tmate server (e.g. ssh.example.org)'
     required: false
