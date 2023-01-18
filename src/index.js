@@ -79,6 +79,7 @@ export async function run() {
     }
 
     let newSessionExtra = ""
+    let tmateSSHDashI = ""
     const limitAccessToActor = core.getInput("limit-access-to-actor")
     if (limitAccessToActor === "true" || limitAccessToActor === "auto") {
       const { actor, apiUrl } = github.context
@@ -97,6 +98,7 @@ export async function run() {
         const authorizedKeysPath = path.join(sshPath, "authorized_keys")
         await fs.promises.writeFile(authorizedKeysPath, keys.data.map(e => e.key).join('\n'))
         newSessionExtra = `-a "${authorizedKeysPath}"`
+        tmateSSHDashI = "ssh -i <path-to-private-SSH-key>"
       }
     }
 
@@ -140,6 +142,9 @@ export async function run() {
         core.info(`Web shell: ${tmateWeb}`);
       }
       core.info(`SSH: ${tmateSSH}`);
+      if (tmateSSHDashI) {
+        core.info(`or: ${tmateSSH.replace(/^ssh/, tmateSSHDashI)}`)
+      }
 
       if (continueFileExists()) {
         core.info("Exiting debugging session because the continue file was created")
