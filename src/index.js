@@ -80,6 +80,7 @@ export async function run() {
 
     let newSessionExtra = ""
     let tmateSSHDashI = ""
+    let publicSSHKeysWarning = ""
     const limitAccessToActor = core.getInput("limit-access-to-actor")
     if (limitAccessToActor === "true" || limitAccessToActor === "auto") {
       const { actor, apiUrl } = github.context
@@ -90,7 +91,7 @@ export async function run() {
         username: actor
       })
       if (keys.data.length === 0) {
-        if (limitAccessToActor === "auto") core.info(`No public SSH keys found for ${actor}; continuing without them`)
+        if (limitAccessToActor === "auto") publicSSHKeysWarning = `No public SSH keys found for ${actor}; continuing without them even if it is less secure (please consider adding an SSH key, see https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)`
         else throw new Error(`No public SSH keys registered with ${actor}'s GitHub profile`)
       } else {
         const sshPath = path.join(os.homedir(), ".ssh")
@@ -138,6 +139,9 @@ export async function run() {
 
     core.debug("Entering main loop")
     while (true) {
+      if (publicSSHKeysWarning) {
+        core.warning(publicSSHKeysWarning)
+      }
       if (tmateWeb) {
         core.info(`Web shell: ${tmateWeb}`);
       }
