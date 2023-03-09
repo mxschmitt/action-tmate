@@ -7,7 +7,7 @@ import * as github from "@actions/github"
 import * as tc from "@actions/tool-cache"
 import { Octokit } from "@octokit/rest"
 
-import { execShellCommand, getValidatedInput, getLinuxDistro } from "./helpers"
+import { execShellCommand, getValidatedInput, getLinuxDistro, useSudoPrefix } from "./helpers"
 
 const TMATE_LINUX_VERSION = "2.4.0"
 
@@ -32,14 +32,19 @@ export async function run() {
       if (process.platform === "darwin") {
         await execShellCommand('brew install tmate');
       } else if (process.platform === "win32") {
-        await execShellCommand('pacman -Sy --noconfirm tmate');
+        await execShellCommand('pacman -S --noconfirm tmate');
       } else {
-        const optionalSudoPrefix = core.getInput("sudo") === "true" ? "sudo " : "";
+        const optionalSudoPrefix = useSudoPrefix() ? "sudo " : "";
         const distro = await getLinuxDistro();
         core.debug("linux distro: [" + distro + "]");
         if (distro === "alpine") {
           // for set -e workaround, we need to install bash because alpine doesn't have it
           await execShellCommand(optionalSudoPrefix + 'apk add openssh-client xz bash');
+        } else if (distro === "arch") {
+          // partial upgrades are not supported so also upgrade everything
+          await execShellCommand(optionalSudoPrefix + 'pacman -Syu --noconfirm xz openssh');
+        } else if (distro === "fedora") {
+          await execShellCommand(optionalSudoPrefix + 'dnf install -y xz openssh');
         } else {
           await execShellCommand(optionalSudoPrefix + 'apt-get update');
           await execShellCommand(optionalSudoPrefix + 'apt-get install -y openssh-client xz-utils');
@@ -75,8 +80,9 @@ export async function run() {
 
     let newSessionExtra = ""
     if (core.getInput("limit-access-to-actor") === "true") {
-      const { actor } = github.context
-      const octokit = new Octokit()
+      const { actor, apiUrl } = github.context
+      const auth = core.getInput('github-token')
+      const octokit = new Octokit({ auth, baseUrl: apiUrl })
 
       const keys = await octokit.users.listPublicKeysForUser({
         username: actor
