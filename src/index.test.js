@@ -47,6 +47,8 @@ describe("Tmate GitHub integration", () => {
       "limit-access-to-actor": "false",
       wait: "true",
     });
+    // const customConnectionString = "foobar"
+    // execShellCommand.mockReturnValue(Promise.resolve(customConnectionString))
     await run();
     expect(execShellCommand).toHaveBeenNthCalledWith(
       1,
@@ -74,6 +76,8 @@ describe("Tmate GitHub integration", () => {
       "limit-access-to-actor": "false",
       wait: "true",
     });
+    // const customConnectionString = "foobar"
+    // execShellCommand.mockReturnValue(Promise.resolve(customConnectionString))
     await run();
     expect(execShellCommand).not.toHaveBeenNthCalledWith(
       1,

@@ -15,6 +15,7 @@ import {
   getTmate,
   getTmateConnectionStrings,
   showTmateConnectionStrings,
+  useSudoPrefix,
   waitUntilDebuggingSessionExit,
 } from "./helpers";
 
@@ -39,14 +40,22 @@ export async function run() {
       } else if (process.platform === "win32") {
         await execShellCommand("pacman -Sy --noconfirm tmate");
       } else {
-        const optionalSudoPrefix =
-          core.getInput("sudo") === "true" ? "sudo " : "";
+        const optionalSudoPrefix = useSudoPrefix() ? "sudo " : "";
         const distro = await getLinuxDistro();
         core.debug("linux distro: [" + distro + "]");
         if (distro === "alpine") {
           // for set -e workaround, we need to install bash because alpine doesn't have it
           await execShellCommand(
             optionalSudoPrefix + "apk add openssh-client xz bash"
+          );
+        } else if (distro === "arch") {
+          // partial upgrades are not supported so also upgrade everything
+          await execShellCommand(
+            optionalSudoPrefix + "pacman -Syu --noconfirm xz openssh"
+          );
+        } else if (distro === "fedora") {
+          await execShellCommand(
+            optionalSudoPrefix + "dnf install -y xz openssh"
           );
         } else {
           await execShellCommand(optionalSudoPrefix + "apt-get update");
@@ -88,8 +97,9 @@ export async function run() {
 
     let newSessionExtra = "";
     if (core.getInput("limit-access-to-actor") === "true") {
-      const { actor } = github.context;
-      const octokit = new Octokit();
+      const { actor, apiUrl } = github.context;
+      const auth = core.getInput("github-token");
+      const octokit = new Octokit({ auth, baseUrl: apiUrl });
 
       const keys = await octokit.users.listPublicKeysForUser({
         username: actor,

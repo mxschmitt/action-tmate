@@ -2,9 +2,17 @@
 import { spawn } from "child_process";
 import * as core from "@actions/core";
 import * as helpers from "./helpers";
-import os from "os";
 import fs from "fs";
+import os from "os";
 import path from "path";
+
+/**
+ * @returns {boolean}
+ */
+export const useSudoPrefix = () => {
+  const input = core.getInput("sudo");
+  return input === "auto" ? os.userInfo().uid !== 0 : input === "true";
+};
 
 /**
  * @param {string} cmd
@@ -15,7 +23,14 @@ export const execShellCommand = (cmd) => {
   return new Promise((resolve, reject) => {
     const proc =
       process.platform !== "win32"
-        ? spawn(cmd, [], { shell: true })
+        ? spawn(cmd, [], {
+            shell: true,
+            env: {
+              ...process.env,
+              HOMEBREW_GITHUB_API_TOKEN:
+                core.getInput("github-token") || undefined,
+            },
+          })
         : spawn("C:\\msys64\\usr\\bin\\bash.exe", ["-lc", cmd], {
             env: {
               ...process.env,
