@@ -1,13 +1,13 @@
 // @ts-check
-import os from "os"
-import fs from "fs"
-import path from "path"
 import * as core from "@actions/core"
 import * as github from "@actions/github"
 import * as tc from "@actions/tool-cache"
 import { Octokit } from "@octokit/rest"
+import fs from "fs"
+import os from "os"
+import path from "path"
 
-import { execShellCommand, getValidatedInput, getLinuxDistro, useSudoPrefix } from "./helpers"
+import { execShellCommand, getLinuxDistro, getValidatedInput, useSudoPrefix } from "./helpers"
 
 const TMATE_LINUX_VERSION = "2.4.0"
 
@@ -26,6 +26,18 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export async function run() {
   try {
+    // custom working directory
+    const workingDirectoryInput = core.getInput('working-directory');
+    if (workingDirectoryInput) {
+      core.info(`Starting with custom working directory: ${workingDirectoryInput}`);
+    }
+    const workingDirectory = !workingDirectoryInput ? undefined : workingDirectoryInput;
+
+    // move to custom working directory if set
+    if (workingDirectory) {
+      process.chdir(workingDirectory);
+    }
+
     let tmateExecutable = "tmate"
     if (core.getInput("install-dependencies") !== "false") {
       core.debug("Installing dependencies")
