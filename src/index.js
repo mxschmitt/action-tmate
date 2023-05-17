@@ -79,7 +79,10 @@ export async function run() {
     }
 
     let newSessionExtra = ""
-    if (core.getInput("limit-access-to-actor") === "true") {
+    let tmateSSHDashI = ""
+    let publicSSHKeysWarning = ""
+    const limitAccessToActor = core.getInput("limit-access-to-actor")
+    if (limitAccessToActor === "true" || limitAccessToActor === "auto") {
       const { actor, apiUrl } = github.context
       const auth = core.getInput('github-token')
       const octokit = new Octokit({ auth, baseUrl: apiUrl })
@@ -88,13 +91,16 @@ export async function run() {
         username: actor
       })
       if (keys.data.length === 0) {
-        throw new Error(`No public SSH keys registered with ${actor}'s GitHub profile`)
+        if (limitAccessToActor === "auto") publicSSHKeysWarning = `No public SSH keys found for ${actor}; continuing without them even if it is less secure (please consider adding an SSH key, see https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)`
+        else throw new Error(`No public SSH keys registered with ${actor}'s GitHub profile`)
+      } else {
+        const sshPath = path.join(os.homedir(), ".ssh")
+        await fs.promises.mkdir(sshPath, { recursive: true })
+        const authorizedKeysPath = path.join(sshPath, "authorized_keys")
+        await fs.promises.writeFile(authorizedKeysPath, keys.data.map(e => e.key).join('\n'))
+        newSessionExtra = `-a "${authorizedKeysPath}"`
+        tmateSSHDashI = "ssh -i <path-to-private-SSH-key>"
       }
-      const sshPath = path.join(os.homedir(), ".ssh")
-      await fs.promises.mkdir(sshPath, { recursive: true })
-      const authorizedKeysPath = path.join(sshPath, "authorized_keys")
-      await fs.promises.writeFile(authorizedKeysPath, keys.data.map(e => e.key).join('\n'))
-      newSessionExtra = `-a "${authorizedKeysPath}"`
     }
 
     const tmate = `${tmateExecutable} -S /tmp/tmate.sock`;
@@ -133,10 +139,16 @@ export async function run() {
 
     core.debug("Entering main loop")
     while (true) {
+      if (publicSSHKeysWarning) {
+        core.warning(publicSSHKeysWarning)
+      }
       if (tmateWeb) {
         core.info(`Web shell: ${tmateWeb}`);
       }
       core.info(`SSH: ${tmateSSH}`);
+      if (tmateSSHDashI) {
+        core.info(`or: ${tmateSSH.replace(/^ssh/, tmateSSHDashI)}`)
+      }
 
       if (continueFileExists()) {
         core.info("Exiting debugging session because the continue file was created")
