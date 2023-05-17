@@ -14,9 +14,10 @@ export const useSudoPrefix = () => {
 
 /**
  * @param {string} cmd
+ * @param {{quiet: boolean} | undefined} [options]
  * @returns {Promise<string>}
  */
-export const execShellCommand = (cmd) => {
+export const execShellCommand = (cmd, options) => {
   core.debug(`Executing shell command: [${cmd}]`)
   return new Promise((resolve, reject) => {
     const proc = process.platform !== "win32" ?
@@ -37,7 +38,7 @@ export const execShellCommand = (cmd) => {
       })
     let stdout = ""
     proc.stdout.on('data', (data) => {
-      process.stdout.write(data);
+      if (!options || !options.quiet) process.stdout.write(data);
       stdout += data.toString();
     });
 
