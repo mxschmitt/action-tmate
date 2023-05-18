@@ -6,6 +6,8 @@ author: 'Max Schmitt'
 runs:
   using: 'node16'
   main: 'lib/index.js'
+  post: 'lib/index.js'
+  post-if: '!cancelled()'
 inputs:
   sudo:
     description: 'If apt should be executed with sudo or without'
@@ -19,6 +21,10 @@ inputs:
     description: 'Whether to authorize only the public SSH keys of the user triggering the workflow (defaults to true if the GitHub profile of the user has a public SSH key)'
     required: false
     default: 'auto'
+  detached:
+    description: 'In detached mode, the workflow job will continue while the tmate session is active'
+    required: false
+    default: 'false'
   tmate-server-host:
     description: 'The hostname for your tmate server (e.g. ssh.example.org)'
     required: false

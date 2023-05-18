@@ -26,6 +26,53 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export async function run() {
   try {
+    /*  Indicates whether the POST action is running */
+    if (!!core.getState('isPost')) {
+      const message = core.getState('message')
+      const tmate = core.getState('tmate')
+      if (tmate && message) {
+        const shutdown = async () => {
+          core.error('Got signal')
+          await execShellCommand(`${tmate} kill-session`)
+          process.exit(1)
+        }
+        // This is needed to fully support canceling the post-job Action, for details see
+        // https://docs.github.com/en/actions/managing-workflow-runs/canceling-a-workflow#steps-github-takes-to-cancel-a-workflow-run
+        process.on('SIGINT', shutdown)
+        process.on('SIGTERM', shutdown)
+        core.debug("Waiting")
+        const hasAnyoneConnectedYet = (() => {
+          let result = false
+          return async () => {
+            return result ||=
+              !didTmateQuit()
+              && '0' !== await execShellCommand(`${tmate} display -p '#{tmate_num_clients}'`, { quiet: true })
+          }
+        })()
+        for (let seconds = 10 * 60; seconds > 0; ) {
+          console.log(`${
+            await hasAnyoneConnectedYet()
+            ? 'Waiting for session to end'
+            : `Waiting for client to connect (at most ${seconds} more second(s))`
+          }\n${message}`)
+
+          if (continueFileExists()) {
+            core.info("Exiting debugging session because the continue file was created")
+            break
+          }
+
+          if (didTmateQuit()) {
+            core.info("Exiting debugging session 'tmate' quit")
+            break
+          }
+
+          await sleep(5000)
+          if (!await hasAnyoneConnectedYet()) seconds -= 5
+        }
+      }
+      return
+    }
+
     let tmateExecutable = "tmate"
     if (core.getInput("install-dependencies") !== "false") {
       core.debug("Installing dependencies")
@@ -136,6 +183,36 @@ export async function run() {
     core.debug("Fetching connection strings")
     const tmateSSH = await execShellCommand(`${tmate} display -p '#{tmate_ssh}'`);
     const tmateWeb = await execShellCommand(`${tmate} display -p '#{tmate_web}'`);
+
+    /*
+      * Publish a variable so that when the POST action runs, it can determine
+      * it should run the appropriate logic. This is necessary since we don't
+      * have a separate entry point.
+      *
+      * Inspired by https://github.com/actions/checkout/blob/v3.1.0/src/state-helper.ts#L56-L60
+      */
+    core.saveState('isPost', 'true')
+
+    const detached = core.getInput("detached")
+    if (detached === "true") {
+      core.debug("Entering detached mode")
+
+      let message = ''
+      if (publicSSHKeysWarning) {
+        message += `::warning::${publicSSHKeysWarning}\n`
+      }
+      if (tmateWeb) {
+        message += `::notice::Web shell: ${tmateWeb}\n`
+      }
+      message += `::notice::SSH: ${tmateSSH}\n`
+      if (tmateSSHDashI) {
+        message += `::notice::or: ${tmateSSH.replace(/^ssh/, tmateSSHDashI)}\n`
+      }
+      core.saveState('message', message)
+      core.saveState('tmate', tmate)
+      console.log(message)
+      return
+    }
 
     core.debug("Entering main loop")
     while (true) {
