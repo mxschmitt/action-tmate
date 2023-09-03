@@ -132,7 +132,7 @@ export async function run() {
     if (limitAccessToActor === "true" || limitAccessToActor === "auto") {
       const { actor, apiUrl } = github.context
       const auth = core.getInput('github-token')
-      const octokit = new Octokit({ auth, baseUrl: apiUrl })
+      const octokit = new Octokit({ auth, baseUrl: apiUrl, request: { fetch: require('node-fetch') }});
 
       const keys = await octokit.users.listPublicKeysForUser({
         username: actor
