@@ -4,7 +4,7 @@ branding:
   icon: terminal
 author: 'Max Schmitt'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'lib/index.js'
   post: 'lib/index.js'
   post-if: '!cancelled()'
