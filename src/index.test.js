@@ -9,7 +9,12 @@ jest.mock("fs", () => ({
   mkdirSync: () => true,
   existsSync: () => true,
   unlinkSync: () => true,
-  writeFileSync: () => true
+  writeFileSync: () => true,
+  promises: new Proxy({}, {
+    get: () => {
+      return () => true
+    }
+  })
 }));
 jest.mock('./helpers', () => {
   const originalModule = jest.requireActual('./helpers');
