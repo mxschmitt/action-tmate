@@ -3,6 +3,7 @@ import { spawn } from 'child_process'
 import * as core from "@actions/core"
 import fs from 'fs'
 import os from 'os'
+import process from "process"
 
 /**
  * @returns {boolean}
@@ -62,6 +63,19 @@ export const execShellCommand = (cmd, options) => {
  */
 export const getValidatedInput = (key, re) => {
   const value = core.getInput(key);
+  if (value !== undefined && !re.test(value)) {
+    throw new Error(`Invalid value for '${key}': '${value}'`);
+  }
+  return value;
+}
+
+/**
+ * @param {string} key
+ * @param {RegExp} re regex to use for validation
+ * @return {string|undefined} {undefined} or throws an error if input doesn't match regex
+ */
+export const getValidatedEnvVars = (key, re) => {
+  const value = process.env[key.toUpperCase()] || ""
   if (value !== undefined && !re.test(value)) {
     throw new Error(`Invalid value for '${key}': '${value}'`);
   }

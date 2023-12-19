@@ -7,7 +7,7 @@ import * as github from "@actions/github"
 import * as tc from "@actions/tool-cache"
 import { Octokit } from "@octokit/rest"
 
-import { execShellCommand, getValidatedInput, getLinuxDistro, useSudoPrefix } from "./helpers"
+import { execShellCommand, getValidatedEnvVars, getLinuxDistro, useSudoPrefix } from "./helpers"
 
 const TMATE_LINUX_VERSION = "2.4.0"
 
@@ -169,7 +169,7 @@ export async function run() {
     for (const [key, option] of Object.entries(options)) {
       if (core.getInput(key) === '')
         continue;
-      const value = getValidatedInput(key, option);
+      const value = getValidatedEnvVars(key, option);
       if (value !== undefined) {
         setDefaultCommand = `${setDefaultCommand} set-option -g ${key} "${value}" \\;`;
       }
