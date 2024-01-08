@@ -6,8 +6,9 @@ import * as core from "@actions/core"
 import * as github from "@actions/github"
 import * as tc from "@actions/tool-cache"
 import { Octokit } from "@octokit/rest"
+import process from "process"
 
-import { execShellCommand, getValidatedInput, getLinuxDistro, useSudoPrefix } from "./helpers"
+import { execShellCommand, getValidatedEnvVars, getLinuxDistro, useSudoPrefix } from "./helpers"
 
 const TMATE_LINUX_VERSION = "2.4.0"
 
@@ -166,12 +167,18 @@ export async function run() {
       "tmate-server-ed25519-fingerprint": /./,
     }
 
+    let host = "";
+    let port = "";
     for (const [key, option] of Object.entries(options)) {
-      if (core.getInput(key) === '')
-        continue;
-      const value = getValidatedInput(key, option);
+      const value = getValidatedEnvVars(key, option);
       if (value !== undefined) {
         setDefaultCommand = `${setDefaultCommand} set-option -g ${key} "${value}" \\;`;
+        if (key === "tmate-server-host") {
+          host = value;
+        }
+        if (key === "tmate-server-port") {
+          port = value;
+        }
       }
     }
 
@@ -182,6 +189,8 @@ export async function run() {
 
     core.debug("Fetching connection strings")
     const tmateSSH = await execShellCommand(`${tmate} display -p '#{tmate_ssh}'`);
+    const [ , ,tokenHost] = tmateSSH.split(" ");
+    const [token, ] = tokenHost.split("@")
     const tmateWeb = await execShellCommand(`${tmate} display -p '#{tmate_web}'`);
 
     /*
@@ -222,7 +231,7 @@ export async function run() {
       if (tmateWeb) {
         core.info(`Web shell: ${tmateWeb}`);
       }
-      core.info(`SSH: ${tmateSSH}`);
+      core.info(`SSH: ssh -p ${port} ${token}@${host}`);
       if (tmateSSHDashI) {
         core.info(`or: ${tmateSSH.replace(/^ssh/, tmateSSHDashI)}`)
       }
