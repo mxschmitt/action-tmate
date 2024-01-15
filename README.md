@@ -126,7 +126,8 @@ jobs:
     - uses: actions/checkout@v3
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
-      timeout-minutes: 15
+      with:
+        timeout-minutes: 15
 ```
 
 ## Only on failure
