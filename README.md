@@ -4,6 +4,8 @@ This is a forked version of [action-tmate](https://github.com/mxschmitt/action-t
 be used with [GitHub Runner Operator](https://github.com/canonical/github-runner-operator/) to
 provide automatic SSH debug access within the Canonical VPN.
 
+You must have your SSH Key [registered on GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account) to be able to connect.
+
 [![GitHub Actions](https://github.com/canonical/action-tmate/workflows/Node.js%20CI/badge.svg)](https://github.com/canonical/action-tmate/actions)
 [![GitHub Marketplace](https://img.shields.io/badge/GitHub-Marketplace-green)](https://github.com/marketplace/actions/debugging-with-tmate)
 
@@ -69,7 +71,7 @@ jobs:
     steps:
       # Enable tmate debugging of manually-triggered workflows if the input option was provided
       - name: Setup tmate session
-        uses: canonical/action-tmate@mxschmitt
+        uses: canonical/action-tmate@main
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
 ```
 <!--
@@ -91,7 +93,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Setup tmate session
-      uses: canonical/action-tmate@mxschmitt
+      uses: canonical/action-tmate@main
       with:
         detached: true
 ```
@@ -111,7 +113,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Setup tmate session
-      uses: canonical/action-tmate@mxschmitt
+      uses: canonical/action-tmate@main
       with:
         sudo: false
 ```
@@ -129,7 +131,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Setup tmate session
-      uses: canonical/action-tmate@mxschmitt
+      uses: canonical/action-tmate@main
       timeout-minutes: 15
 ```
 
@@ -149,31 +151,11 @@ jobs:
     - uses: actions/checkout@v3
     - name: Setup tmate session
       if: ${{ failure() }}
-      uses: canonical/action-tmate@mxschmitt
+      uses: canonical/action-tmate@main
 ```
 <!--
 {% endraw %}
 -->
-
-## Use registered public SSH key(s)
-
-If [you have registered one or more public SSH keys with your GitHub profile](https://docs.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account), tmate will be started such that only those keys are authorized to connect, otherwise anybody can connect to the tmate session. If you want to require a public SSH key to be installed with the tmate session, no matter whether the user who started the workflow has registered any in their GitHub profile, you will need to configure the setting `limit-access-to-actor` to `true`, like so:
-
-```yaml
-name: CI
-on: [push]
-jobs:
-  build:
-    runs-on: self-hosted
-    steps:
-    - uses: actions/checkout@v3
-    - name: Setup tmate session
-      uses: canonical/action-tmate@mxschmitt
-      with:
-        limit-access-to-actor: true
-```
-
-If the registered public SSH key is not your default private SSH key, you will need to specify the path manually, like so: `ssh -i <path-to-key> <tmate-connection-string>`.
 
 ## Use your own tmate servers
 
@@ -189,28 +171,12 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
+      uses: canonical/action-tmate@main
       with:
 -        tmate-server-host: ssh.tmate.io
 -        tmate-server-port: 22
 -        tmate-server-rsa-fingerprint: SHA256:Hthk2T/M/Ivqfk1YYUn5ijC2Att3+UPzD7Rn72P5VWs
 -        tmate-server-ed25519-fingerprint: SHA256:jfttvoypkHiQYUqUCwKeqd9d1fJj/ZiQlFOHVl6E9sI
-```
-
-## Skip installing tmate
-
-By default, tmate and its dependencies are installed in a platform-dependent manner. When using self-hosted agents, this can become unnecessary or can even break. You can skip installing tmate and its dependencies using `install-dependencies`:
-
-```yaml
-name: CI
-on: [push]
-jobs:
-  build:
-    runs-on: [self-hosted, linux]
-    steps:
-    - uses: canonical/action-tmate@mxschmitt
-      with:
-        install-dependencies: false
 ```
 
 ## Continue a workflow
