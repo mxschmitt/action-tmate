@@ -25,6 +25,10 @@ inputs:
     description: 'In detached mode, the workflow job will continue while the tmate session is active'
     required: false
     default: 'false'
+  connect-timeout:
+    description: 'How long in seconds to wait for a connection to be established'
+    required: false
+    default: '600'
   tmate-server-host:
     description: 'The hostname for your tmate server (e.g. ssh.example.org)'
     required: false
