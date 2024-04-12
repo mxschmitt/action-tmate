@@ -50,7 +50,7 @@ export async function run() {
           }
         })()
 
-        let connectTimeoutSeconds = parseInt(core.getInput("connect-timeout"))
+        let connectTimeoutSeconds = parseInt(core.getInput("connect-timeout-seconds"))
         if (Number.isNaN(connectTimeoutSeconds) || connectTimeoutSeconds <= 0) {
           connectTimeoutSeconds = 10 * 60
         }

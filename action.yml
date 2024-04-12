@@ -25,7 +25,7 @@ inputs:
     description: 'In detached mode, the workflow job will continue while the tmate session is active'
     required: false
     default: 'false'
-  connect-timeout:
+  connect-timeout-seconds:
     description: 'How long in seconds to wait for a connection to be established'
     required: false
     default: '600'
