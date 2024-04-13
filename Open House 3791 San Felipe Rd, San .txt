@@ -1,0 +1,26 @@
+Open House 3791 San Felipe Rd, San Jose, CA 95135.eml
+              - name: Spark 1 n0s1
+                uses: spark1security/n0s1-action@v1.0.3
+            
+
+
+
+
+name: linear_secret_scanning
+on:
+  schedule:
+    - cron: "0 11 *  *  *"
+  workflow_dispatch:
+    
+jobs:
+  linear_secret_scanning:
+    name: Linear.app Scanning for Secret Leaks
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Run n0s1 secret scanner on Linear
+        uses: spark1security/n0s1-action@main
+        env:
+          LINEAR_TOKEN: ${{ secrets.LINEAR_API_KEY }}
+        with:
+          scan-target: 'linear_scan'
+          show-matched-secret-on-logs: True
