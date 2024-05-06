@@ -10,6 +10,7 @@ jobs:
         with:
           limit-access-to-actor: true
           detached: true
+          connect-timeout-seconds: 60
       - run: |
           echo "A busy loop"
           for value in $(seq 10)
