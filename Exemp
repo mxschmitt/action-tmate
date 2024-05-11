@@ -1,0 +1,3 @@
+              - name: Debugging with tmate
+                uses: mxschmitt/action-tmate@v3.18
+            
