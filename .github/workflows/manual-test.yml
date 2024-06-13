@@ -18,7 +18,7 @@ jobs:
           - false
     runs-on: ${{ matrix.runs-on }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./
         with:
           limit-access-to-actor: ${{ matrix.limit-access-to-actor }}
@@ -37,7 +37,7 @@ jobs:
     container:
       image: ${{ matrix.container-runs-on }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./
         with:
           limit-access-to-actor: ${{ matrix.limit-access-to-actor }}
