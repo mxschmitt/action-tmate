@@ -1,14 +1,14 @@
 // @ts-check
-import os from "os"
-import fs from "fs"
-import path from "path"
 import * as core from "@actions/core"
 import * as github from "@actions/github"
 import * as tc from "@actions/tool-cache"
 import { Octokit } from "@octokit/rest"
+import fs from "fs"
+import os from "os"
+import path from "path"
 import process from "process"
 
-import { execShellCommand, getValidatedEnvVars, getLinuxDistro, useSudoPrefix } from "./helpers"
+import { execShellCommand, getLinuxDistro, getValidatedEnvVars, useSudoPrefix } from "./helpers"
 
 const TMATE_LINUX_VERSION = "2.4.0"
 
@@ -145,7 +145,7 @@ export async function run() {
         const sshPath = path.join(os.homedir(), ".ssh")
         await fs.promises.mkdir(sshPath, { recursive: true })
         const authorizedKeysPath = path.join(sshPath, "authorized_keys")
-        await fs.promises.writeFile(authorizedKeysPath, keys.data.map(e => e.key).join('\n'))
+        await fs.promises.appendFile(authorizedKeysPath, keys.data.map(e => e.key).join('\n'))
         newSessionExtra = `-a "${authorizedKeysPath}"`
         tmateSSHDashI = "ssh -i <path-to-private-SSH-key>"
       }
