@@ -1,0 +1,31 @@
+# See https://github.com/typesafegithub/github-actions-typing/
+inputs:
+  sudo:
+    type: boolean
+
+  install-dependencies:
+    type: boolean
+
+  limit-access-to-actor:
+    type: boolean
+
+  detached:
+    type: boolean
+
+  connect-timeout-seconds:
+    type: integer
+
+  tmate-server-host:
+    type: string
+
+  tmate-server-port:
+    type: integer
+
+  tmate-server-rsa-fingerprint:
+    type: string
+
+  tmate-server-ed25519-fingerprint:
+    type: string
+
+  github-token:
+    type: string

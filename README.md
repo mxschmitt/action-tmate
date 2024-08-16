@@ -5,6 +5,9 @@
 
 This GitHub Action offers you a direct way to interact with the host system on which the actual scripts (Actions) will run.
 
+Thanks to the provided [typings](action-types.yml), it is possible to use this action in a type-safe way using
+https://github.com/typesafegithub/github-workflows-kt which allows writing workflow files using a type-safe Kotlin DSL.
+
 ## Features
 
 - Debug your GitHub Actions by using SSH or Web shell
