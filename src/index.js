@@ -96,7 +96,7 @@ export async function run() {
         } else if (distro === "arch") {
           // partial upgrades are not supported so also upgrade everything
           await execShellCommand(optionalSudoPrefix + 'pacman -Syu --noconfirm xz openssh');
-        } else if (distro === "fedora") {
+        } else if (distro === "fedora" || distro === "centos" || distro === "rhel" || distro === "almalinux") {
           await execShellCommand(optionalSudoPrefix + 'dnf install -y xz openssh');
         } else {
           await execShellCommand(optionalSudoPrefix + 'apt-get update');
