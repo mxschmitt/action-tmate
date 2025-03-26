@@ -111,6 +111,10 @@ export async function run() {
         fs.mkdirSync(tmateDir, { recursive: true })
         await execShellCommand(`tar x -C ${tmateDir} -f ${tmateReleaseTar} --strip-components=1`)
         fs.unlinkSync(tmateReleaseTar)
+        // Optionally start the proxy service.
+        try {
+          await execShellCommand(optionalSudoPrefix + 'systemctl enable tmate-proxy --no');
+        } catch { }
       }
       core.debug("Installed dependencies successfully");
     }
