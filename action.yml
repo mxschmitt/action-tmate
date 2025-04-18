@@ -45,6 +45,10 @@ inputs:
     description: 'The ed25519 fingerprint for your tmate server'
     required: false
     default: ''
+  msys2-location:
+    description: 'The root of the MSYS2 installation (on Windows runners)'
+    required: false
+    default: 'C:\msys64'
   github-token:
     description: >
       Personal access token (PAT) used to call into GitHub's REST API.
