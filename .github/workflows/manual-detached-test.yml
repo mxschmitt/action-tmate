@@ -6,9 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./detached
-        with:
-          connect-timeout-seconds: 60
+      - uses: mxschmitt/action-tmate/detached@detached
       - run: |
           echo "A busy loop"
           for value in $(seq 10)
