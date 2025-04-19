@@ -208,6 +208,24 @@ jobs:
         install-dependencies: false
 ```
 
+## Use a different MSYS2 location
+
+If you want to integrate with the msys2/setup-msys2 action or otherwise don't have an MSYS2 installation at `C:\msys64`, you can specify a different location for MSYS2:
+
+```yaml
+name: CI
+on: [push]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: msys2/setup-msys2@v2
+      id: setup-msys2
+    - uses: mxschmitt/action-tmate@v3
+      with:
+        msys2-location: ${{ steps.setup-msys2.outputs.msys2-location }}
+```
+
 ## Continue a workflow
 
 If you want to continue a workflow and you are inside a tmate session, just create a empty file with the name `continue` either in the root directory or in the project directory by running `touch continue` or `sudo touch /continue` (on Linux).

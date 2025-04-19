@@ -252,11 +252,11 @@ export async function run() {
 }
 
 function didTmateQuit() {
-  const tmateSocketPath = process.platform === "win32" ? "C:/msys64/tmp/tmate.sock" : "/tmp/tmate.sock"
+  const tmateSocketPath = process.platform === "win32" ? `${core.getInput("msys2-location") || "C:\\msys64"}/tmp/tmate.sock` : "/tmp/tmate.sock"
   return !fs.existsSync(tmateSocketPath)
 }
 
 function continueFileExists() {
-  const continuePath = process.platform === "win32" ? "C:/msys64/continue" : "/continue"
+  const continuePath = process.platform === "win32" ? `${core.getInput("msys2-location") || "C:\\msys64"}/continue` : "/continue"
   return fs.existsSync(continuePath) || fs.existsSync(path.join(process.env.GITHUB_WORKSPACE, "continue"))
 }

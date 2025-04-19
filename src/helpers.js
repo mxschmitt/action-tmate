@@ -28,7 +28,7 @@ export const execShellCommand = (cmd, options) => {
           HOMEBREW_GITHUB_API_TOKEN: core.getInput('github-token') || undefined
         }
       }) :
-      spawn("C:\\msys64\\usr\\bin\\bash.exe", ["-lc", cmd], {
+      spawn(`${core.getInput("msys2-location") || "C:\\msys64"}\\usr\\bin\\bash.exe`, ["-lc", cmd], {
         env: {
           ...process.env,
           "MSYS2_PATH_TYPE": "inherit", /* Inherit previous path */
