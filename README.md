@@ -94,6 +94,8 @@ jobs:
 
 By default, this mode will wait at the end of the job for a user to connect and then to terminate the tmate session. If no user has connected within 10 minutes after the post-job step started, it will terminate the `tmate` session and quit gracefully.
 
+As this mode has turned out to be so useful as to having the potential for being the default mode once time travel becomes available, it is also available as `mxschmitt/action-tmate/detached` for convenience.
+
 ## Without sudo
 
 By default we run installation commands using sudo on Linux. If you get `sudo: not found` you can use the parameter below to execute the commands directly.
