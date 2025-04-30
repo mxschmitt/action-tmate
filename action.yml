@@ -60,5 +60,7 @@ inputs:
 outputs:
   ssh-command:
     description: 'The SSH command to connect to the tmate session (only set when detached mode is enabled)'
+  ssh-address:
+    description: 'The raw SSH address without the "ssh" prefix (only set when detached mode is enabled)'
   web-url:
     description: 'The web URL to connect to the tmate session (only set when detached mode is enabled and web URL is available)'

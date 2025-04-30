@@ -219,6 +219,8 @@ export async function run() {
       
       // Set the SSH command as an output so other jobs can use it
       core.setOutput('ssh-command', tmateSSH)
+      // Extract and set the raw SSH address (without the "ssh" prefix)
+      core.setOutput('ssh-address', tmateSSH.replace(/^ssh /, ''))
       if (tmateWeb) {
         core.setOutput('web-url', tmateWeb)
       }

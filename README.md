@@ -101,6 +101,7 @@ As this mode has turned out to be so useful as to having the potential for being
 When running in detached mode, the action sets the following outputs that can be used in subsequent steps or jobs:
 
 - `ssh-command`: The SSH command to connect to the tmate session
+- `ssh-address`: The raw SSH address without the "ssh" prefix
 - `web-url`: The web URL to connect to the tmate session (if available)
 
 Example workflow using the SSH command in another job:
@@ -113,6 +114,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       ssh-command: ${{ steps.tmate.outputs.ssh-command }}
+      ssh-address: ${{ steps.tmate.outputs.ssh-address }}
     steps:
     - uses: actions/checkout@v4
     - name: Setup tmate session
@@ -127,8 +129,7 @@ jobs:
     steps:
     - name: Display SSH command
       run: |
-        echo "Connect to the tmate session with:"
-        echo ${{ needs.setup-tmate.outputs.ssh-command }}
+        # Send a Slack message to someone telling them they can ssh to ${{ needs.setup-tmate.outputs.ssh-address }}
 ```
 
 ## Without sudo
