@@ -216,6 +216,13 @@ export async function run() {
       }
       core.saveState('message', message)
       core.saveState('tmate', tmate)
+      
+      // Set the SSH command as an output so other jobs can use it
+      core.setOutput('ssh-command', tmateSSH)
+      if (tmateWeb) {
+        core.setOutput('web-url', tmateWeb)
+      }
+      
       console.log(message)
       return
     }

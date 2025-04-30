@@ -96,6 +96,41 @@ By default, this mode will wait at the end of the job for a user to connect and 
 
 As this mode has turned out to be so useful as to having the potential for being the default mode once time travel becomes available, it is also available as `mxschmitt/action-tmate/detached` for convenience.
 
+### Using SSH command output in other jobs
+
+When running in detached mode, the action sets the following outputs that can be used in subsequent steps or jobs:
+
+- `ssh-command`: The SSH command to connect to the tmate session
+- `web-url`: The web URL to connect to the tmate session (if available)
+
+Example workflow using the SSH command in another job:
+
+```yaml
+name: Debug with tmate
+on: [push]
+jobs:
+  setup-tmate:
+    runs-on: ubuntu-latest
+    outputs:
+      ssh-command: ${{ steps.tmate.outputs.ssh-command }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup tmate session
+      id: tmate
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
+        
+  use-ssh-command:
+    needs: setup-tmate
+    runs-on: ubuntu-latest
+    steps:
+    - name: Display SSH command
+      run: |
+        echo "Connect to the tmate session with:"
+        echo ${{ needs.setup-tmate.outputs.ssh-command }}
+```
+
 ## Without sudo
 
 By default we run installation commands using sudo on Linux. If you get `sudo: not found` you can use the parameter below to execute the commands directly.
