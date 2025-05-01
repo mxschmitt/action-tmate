@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node src/index.js",
     "build": "ncc build src/main.js -o lib",
+    "update-detached-action.yml": "sed '/^runs:$/{N;N;N;s/lib\\//..\\/&/g;};/^  detached:/{N;N;N;s/\\(default: .\\)false/\\1true/g;}' action.yml >detached/action.yml",
     "test": "GITHUB_EVENT_PATH= jest"
   },
   "repository": {

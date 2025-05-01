@@ -13,6 +13,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20
+      - name: Verify that action.yml files are in sync
+        run: |
+          npm run update-detached-action.yml &&
+          if ! git diff --exit-code \*action.yml
+          then
+            echo '::error::action.yml files are not in sync, maybe run `npm run update-detached-action.yml`?'
+            exit 1
+          fi
       - name: Install dependencies
         run: npm ci
       - name: Run tests
@@ -24,7 +32,8 @@ jobs:
       - name: Verify that the project is built
         run: |
           if [[ -n $(git status -s) ]]; then
-            echo "ERROR: generated dist/ differs from the current sources"
+            echo "ERROR: generated lib/ differs from the current sources"
+            git status -s
             git diff
             exit 1
           fi
