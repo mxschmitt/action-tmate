@@ -35,6 +35,11 @@
     })
     .filter(runsOn => runsOn)
 
+  // The Windows/ARM64 runners are in public preview (and for the time being,
+  // not listed in the `runner-images` README file), so we need to add this
+  // manually.
+  if (!choices.includes('windows-11-arm')) choices.push('windows-11-arm')
+
   // Now edit the `manual-test` workflow definition
   const ymlPath = `${__dirname}/manual-test.yml`
   const yml = fs.readFileSync(ymlPath, 'utf8')

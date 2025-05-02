@@ -19,6 +19,7 @@ on:
           - windows-2025
           - windows-2022
           - windows-2019
+          - windows-11-arm
       container-runs-on:
         type: choice
         description: 'The Docker container to run the job on (this overrides the `runs-on` input)'
