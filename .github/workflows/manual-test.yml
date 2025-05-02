@@ -1,12 +1,13 @@
-name: Manual test matrix
-on: workflow_dispatch
-
-jobs:
-  test:
-    strategy:
-      fail-fast: false
-      matrix:
-        runs-on:
+name: Manual test
+on:
+  workflow_dispatch:
+    inputs:
+      runs-on:
+        type: choice
+        description: 'The runner pool to run the job on'
+        required: true
+        default: 'ubuntu-22.04'
+        options:
           - ubuntu-22.04
           - ubuntu-24.04
           - macos-13
@@ -15,31 +16,42 @@ jobs:
           - windows-2019
           - windows-2022
           - windows-2025
-        limit-access-to-actor:
-          - true
-          - false
-    runs-on: ${{ matrix.runs-on }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./
-        with:
-          limit-access-to-actor: ${{ matrix.limit-access-to-actor }}
-  test-container:
-    strategy:
-      fail-fast: false
-      matrix:
-        container-runs-on:
+      container-runs-on:
+        type: choice
+        description: 'The Docker container to run the job on (this overrides the `runs-on` input)'
+        required: false
+        default: '(none)'
+        options:
+          - '(none)'
           - fedora:latest
           - archlinux:latest
           - ubuntu:latest
-        limit-access-to-actor:
-          - true
-          - false
-    runs-on: ubuntu-latest
-    container:
-      image: ${{ matrix.container-runs-on }}
+      limit-access-to-actor:
+        type: choice
+        description: 'Whether to limit access to the actor only'
+        required: true
+        default: 'auto'
+        options:
+          - auto
+          - 'true'
+          - 'false'
+
+jobs:
+  test:
+    if: ${{ inputs.container-runs-on == '(none)' }}
+    runs-on: ${{ inputs.runs-on }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./
         with:
-          limit-access-to-actor: ${{ matrix.limit-access-to-actor }}
+          limit-access-to-actor: ${{ inputs.limit-access-to-actor }}
+  test-container:
+    if: ${{ inputs.container-runs-on != '(none)' }}
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ inputs.container-runs-on }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          limit-access-to-actor: ${{ inputs.limit-access-to-actor }}
