@@ -6,16 +6,19 @@ on:
         type: choice
         description: 'The runner pool to run the job on'
         required: true
-        default: 'ubuntu-22.04'
+        default: ubuntu-24.04
         options:
-          - ubuntu-22.04
           - ubuntu-24.04
-          - macos-13
-          - macos-14
+          - ubuntu-22.04
+          - macos-15-large
           - macos-15
-          - windows-2019
-          - windows-2022
+          - macos-14-large
+          - macos-14
+          - macos-13
+          - macos-13-xlarge
           - windows-2025
+          - windows-2022
+          - windows-2019
       container-runs-on:
         type: choice
         description: 'The Docker container to run the job on (this overrides the `runs-on` input)'
