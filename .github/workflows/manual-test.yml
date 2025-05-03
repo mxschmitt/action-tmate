@@ -1,45 +1,73 @@
-name: Manual test matrix
-on: workflow_dispatch
-
-jobs:
-  test:
-    strategy:
-      fail-fast: false
-      matrix:
-        runs-on:
-          - ubuntu-22.04
+name: Manual test
+on:
+  workflow_dispatch:
+    inputs:
+      runs-on:
+        type: choice
+        description: 'The runner pool to run the job on'
+        required: true
+        default: ubuntu-24.04
+        options:
           - ubuntu-24.04
-          - macos-13
-          - macos-14
+          - ubuntu-22.04
+          - macos-15-large
           - macos-15
-          - windows-2019
-          - windows-2022
+          - macos-14-large
+          - macos-14
+          - macos-13
+          - macos-13-xlarge
           - windows-2025
-        limit-access-to-actor:
-          - true
-          - false
-    runs-on: ${{ matrix.runs-on }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./
-        with:
-          limit-access-to-actor: ${{ matrix.limit-access-to-actor }}
-  test-container:
-    strategy:
-      fail-fast: false
-      matrix:
-        container-runs-on:
+          - windows-2022
+          - windows-2019
+          - windows-11-arm
+      container-runs-on:
+        type: choice
+        description: 'The Docker container to run the job on (this overrides the `runs-on` input)'
+        required: false
+        default: '(none)'
+        options:
+          - '(none)'
           - fedora:latest
           - archlinux:latest
           - ubuntu:latest
-        limit-access-to-actor:
-          - true
-          - false
+      limit-access-to-actor:
+        type: choice
+        description: 'Whether to limit access to the actor only'
+        required: true
+        default: 'auto'
+        options:
+          - auto
+          - 'true'
+          - 'false'
+
+jobs:
+  test:
+    if: ${{ inputs.container-runs-on == '(none)' }}
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - uses: msys2/setup-msys2@v2
+        # The public preview of GitHub-hosted Windows/ARM64 runners lacks
+        # a working MSYS2 installation, so we need to set it up ourselves.
+        if: ${{ inputs.runs-on == 'windows-11-arm' }}
+        with:
+          msystem: 'CLANGARM64'
+          # We cannot use `C:\` because `msys2/setup-msys2` erroneously
+          # believes that an MSYS2 exists at `C:\msys64`, but it doesn't,
+          # which is the entire reason why we need to set it up in this
+          # here step... However, by using `C:\.\` we can fool that
+          # overzealous check.
+          location: C:\.\
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          limit-access-to-actor: ${{ inputs.limit-access-to-actor }}
+  test-container:
+    if: ${{ inputs.container-runs-on != '(none)' }}
     runs-on: ubuntu-latest
     container:
-      image: ${{ matrix.container-runs-on }}
+      image: ${{ inputs.container-runs-on }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./
         with:
-          limit-access-to-actor: ${{ matrix.limit-access-to-actor }}
+          limit-access-to-actor: ${{ inputs.limit-access-to-actor }}
