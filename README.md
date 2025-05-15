@@ -33,7 +33,7 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup tmate session
       uses: canonical/action-tmate@main
 ```
@@ -91,7 +91,7 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup tmate session
       uses: canonical/action-tmate@main
       with:
@@ -99,6 +99,44 @@ jobs:
 ```
 
 By default, this mode will wait at the end of the job for a user to connect and then to terminate the tmate session. If no user has connected within 10 minutes after the post-job step started, it will terminate the `tmate` session and quit gracefully.
+
+As this mode has turned out to be so useful as to having the potential for being the default mode once time travel becomes available, it is also available as `mxschmitt/action-tmate/detached` for convenience.
+
+### Using SSH command output in other jobs
+
+When running in detached mode, the action sets the following outputs that can be used in subsequent steps or jobs:
+
+- `ssh-command`: The SSH command to connect to the tmate session
+- `ssh-address`: The raw SSH address without the "ssh" prefix
+- `web-url`: The web URL to connect to the tmate session (if available)
+
+Example workflow using the SSH command in another job:
+
+```yaml
+name: Debug with tmate
+on: [push]
+jobs:
+  setup-tmate:
+    runs-on: ubuntu-latest
+    outputs:
+      ssh-command: ${{ steps.tmate.outputs.ssh-command }}
+      ssh-address: ${{ steps.tmate.outputs.ssh-address }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup tmate session
+      id: tmate
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
+        
+  use-ssh-command:
+    needs: setup-tmate
+    runs-on: ubuntu-latest
+    steps:
+    - name: Display SSH command
+      run: |
+        # Send a Slack message to someone telling them they can ssh to ${{ needs.setup-tmate.outputs.ssh-address }}
+```
 
 ## Without sudo
 
@@ -111,7 +149,7 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup tmate session
       uses: canonical/action-tmate@main
       with:
@@ -129,7 +167,7 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup tmate session
       uses: canonical/action-tmate@main
       timeout-minutes: 15
@@ -148,7 +186,7 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup tmate session
       if: ${{ failure() }}
       uses: canonical/action-tmate@main
@@ -156,6 +194,26 @@ jobs:
 <!--
 {% endraw %}
 -->
+
+## Use registered public SSH key(s)
+
+If [you have registered one or more public SSH keys with your GitHub profile](https://docs.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account), tmate will be started such that only those keys are authorized to connect, otherwise anybody can connect to the tmate session. If you want to require a public SSH key to be installed with the tmate session, no matter whether the user who started the workflow has registered any in their GitHub profile, you will need to configure the setting `limit-access-to-actor` to `true`, like so:
+
+```yaml
+name: CI
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup tmate session
+      uses: canonical/action-tmate@v3
+      with:
+        limit-access-to-actor: true
+```
+
+If the registered public SSH key is not your default private SSH key, you will need to specify the path manually, like so: `ssh -i <path-to-key> <tmate-connection-string>`.
 
 ## Use your own tmate servers
 
@@ -169,7 +227,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup tmate session
       uses: canonical/action-tmate@main
       with:
@@ -179,9 +237,27 @@ jobs:
 -        tmate-server-ed25519-fingerprint: SHA256:jfttvoypkHiQYUqUCwKeqd9d1fJj/ZiQlFOHVl6E9sI
 ```
 
+## Use a different MSYS2 location
+
+If you want to integrate with the msys2/setup-msys2 action or otherwise don't have an MSYS2 installation at `C:\msys64`, you can specify a different location for MSYS2:
+
+```yaml
+name: CI
+on: [push]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: msys2/setup-msys2@v2
+      id: setup-msys2
+    - uses: mxschmitt/action-tmate@v3
+      with:
+        msys2-location: ${{ steps.setup-msys2.outputs.msys2-location }}
+```
+
 ## Continue a workflow
 
-If you want to continue a workflow and you are inside a tmate session, just create a empty file with the name `continue` either in the root directory or in the project directory by running `touch continue` or `sudo touch /continue`.
+If you want to continue a workflow and you are inside a tmate session, just create a empty file with the name `continue` either in the root directory or in the project directory by running `touch continue` or `sudo touch /continue` (on Linux).
 
 ## Connection string / URL is not visible
 

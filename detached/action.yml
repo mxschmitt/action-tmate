@@ -5,8 +5,8 @@ branding:
 author: 'Max Schmitt'
 runs:
   using: 'node20'
-  main: 'lib/index.js'
-  post: 'lib/index.js'
+  main: '../lib/index.js'
+  post: '../lib/index.js'
   post-if: '!cancelled()'
 inputs:
   sudo:
@@ -24,7 +24,7 @@ inputs:
   detached:
     description: 'In detached mode, the workflow job will continue while the tmate session is active'
     required: false
-    default: 'false'
+    default: 'true'
   connect-timeout-seconds:
     description: 'How long in seconds to wait for a connection to be established'
     required: false

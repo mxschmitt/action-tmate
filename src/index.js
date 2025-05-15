@@ -50,7 +50,13 @@ export async function run() {
               && '0' !== await execShellCommand(`${tmate} display -p '#{tmate_num_clients}'`, { quiet: true })
           }
         })()
-        for (let seconds = 10 * 60; seconds > 0; ) {
+
+        let connectTimeoutSeconds = parseInt(core.getInput("connect-timeout-seconds"))
+        if (Number.isNaN(connectTimeoutSeconds) || connectTimeoutSeconds <= 0) {
+          connectTimeoutSeconds = 10 * 60
+        }
+
+        for (let seconds = connectTimeoutSeconds; seconds > 0; ) {
           console.log(`${
             await hasAnyoneConnectedYet()
             ? 'Waiting for session to end'
@@ -91,7 +97,7 @@ export async function run() {
         } else if (distro === "arch") {
           // partial upgrades are not supported so also upgrade everything
           await execShellCommand(optionalSudoPrefix + 'pacman -Syu --noconfirm xz openssh');
-        } else if (distro === "fedora") {
+        } else if (distro === "fedora" || distro === "centos" || distro === "rhel" || distro === "almalinux") {
           await execShellCommand(optionalSudoPrefix + 'dnf install -y xz openssh');
         } else {
           await execShellCommand(optionalSudoPrefix + 'apt-get update');
@@ -227,6 +233,15 @@ export async function run() {
       }
       core.saveState('message', message)
       core.saveState('tmate', tmate)
+      
+      // Set the SSH command as an output so other jobs can use it
+      core.setOutput('ssh-command', tmateSSH)
+      // Extract and set the raw SSH address (without the "ssh" prefix)
+      core.setOutput('ssh-address', tmateSSH.replace(/^ssh /, ''))
+      if (tmateWeb) {
+        core.setOutput('web-url', tmateWeb)
+      }
+      
       console.log(message)
       return
     }
@@ -263,11 +278,11 @@ export async function run() {
 }
 
 function didTmateQuit() {
-  const tmateSocketPath = process.platform === "win32" ? "C:/msys64/tmp/tmate.sock" : "/tmp/tmate.sock"
+  const tmateSocketPath = process.platform === "win32" ? `${core.getInput("msys2-location") || "C:\\msys64"}/tmp/tmate.sock` : "/tmp/tmate.sock"
   return !fs.existsSync(tmateSocketPath)
 }
 
 function continueFileExists() {
-  const continuePath = process.platform === "win32" ? "C:/msys64/continue" : "/continue"
+  const continuePath = process.platform === "win32" ? `${core.getInput("msys2-location") || "C:\\msys64"}/continue` : "/continue"
   return fs.existsSync(continuePath) || fs.existsSync(path.join(process.env.GITHUB_WORKSPACE, "continue"))
 }

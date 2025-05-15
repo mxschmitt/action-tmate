@@ -5,11 +5,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: ./
+      - uses: actions/checkout@v4
+      - uses: ./detached
         with:
-          limit-access-to-actor: true
-          detached: true
+          connect-timeout-seconds: 60
       - run: |
           echo "A busy loop"
           for value in $(seq 10)
