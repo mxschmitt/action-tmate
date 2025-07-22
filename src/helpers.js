@@ -75,7 +75,7 @@ export const getValidatedInput = (key, re) => {
 export const getLinuxDistro = async () => {
   try {
     const osRelease = await fs.promises.readFile("/etc/os-release")
-    const match = osRelease.toString().match(/^ID=(.*)$/m)
+    const match = osRelease.toString().match(/^ID=(?:\W)?(\w*)(?:\W)?$/m)
     return match ? match[1] : "(unknown)"
   } catch (e) {
     return "(unknown)"
