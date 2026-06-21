@@ -28,7 +28,7 @@
     "@octokit/rest": "^20.1.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.11",
+    "@babel/core": "^7.29.6",
     "@babel/preset-env": "^7.22.14",
     "@vercel/ncc": "^0.36.1",
     "babel-jest": "^29.6.4",
