@@ -57,7 +57,7 @@ jobs:
           # here step... However, by using `C:\.\` we can fool that
           # overzealous check.
           location: C:\.\
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./
         with:
           limit-access-to-actor: ${{ inputs.limit-access-to-actor }}
@@ -67,7 +67,7 @@ jobs:
     container:
       image: ${{ inputs.container-runs-on }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./
         with:
           limit-access-to-actor: ${{ inputs.limit-access-to-actor }}
