@@ -22,10 +22,10 @@
   "author": "Max Schmitt <max@schmitt.mx>",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.11.1",
-    "@actions/github": "^6.0.1",
-    "@actions/tool-cache": "^2.0.2",
-    "@octokit/rest": "^20.1.2"
+    "@actions/core": "^3.0.1",
+    "@actions/github": "^9.1.1",
+    "@actions/tool-cache": "^4.0.0",
+    "@octokit/rest": "^22.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
