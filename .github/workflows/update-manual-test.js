@@ -11,33 +11,38 @@
   // This will be the first `ubuntu` one.
   let defaultOption = ''
 
-  const choices = readme
+  const availableImagesSection = readme
     // Get the "Available Images" section
     .split(/\n## Available Images\n/)[1]
-    .split(/##\s*[^#]/)[0]
+    .split(/\n##\s+/)[0]
+  if (!availableImagesSection) throw new Error("Could not parse the 'Available Images' section from the runner-images README file")
+
+  const choices = availableImagesSection
     // Split by lines
     .split('\n')
     .map(line => {
-        // The relevant lines are table rows; The first column is the image name,
-        // the second one contains a relatively free-form list of the `runs-on`
-        // options that we are interested in. Those `runs-on` options are
-        // surrounded by backticks.
-        const match = line.match(/^\|\s*([^|]+)\s*\|([^|]*)`([^`|]+)`\s*\|/)
-        if (!match) return false // Skip e.g. the table header and empty lines
-        let runsOn = match[3] // default to the last `runs-on` option
-        const alternatives = match[2]
-          .split(/`([^`]*)`/) // split by backticks
-          .filter((_, i) => (i % 2)) // keep only the text between backticks
+        // The relevant lines are table rows; The third column (`YAML Label`)
+        // contains one or more backticked `runs-on` labels.
+        if (!line.startsWith('|')) return false
+        const columns = line.split('|').map(e => e.trim())
+        const yamlLabels = columns[3]
+        if (!yamlLabels || yamlLabels === "YAML Label") return false
+
+        const alternatives = [...yamlLabels.matchAll(/`([^`]+)`/g)]
+          .map(([, label]) => label)
           .sort((a, b) => a.length - b.length) // order by length
-        if (alternatives.length > 0 && alternatives[0].length < runsOn.length) runsOn = alternatives[0]
-        if (!defaultOption && match[3].startsWith('ubuntu-')) defaultOption = runsOn
+        if (alternatives.length === 0) return false
+
+        const runsOn = alternatives[0]
+        const isPreviewImage = /\bpreview\b/i.test(line)
+        if (!defaultOption && runsOn.startsWith('ubuntu-') && !isPreviewImage) defaultOption = runsOn
         return runsOn
     })
     .filter(runsOn => runsOn)
+  if (!defaultOption) throw new Error("Could not determine a default Ubuntu runner label")
 
-  // The Windows/ARM64 runners are in public preview (and for the time being,
-  // not listed in the `runner-images` README file), so we need to add this
-  // manually.
+  // Keep this as a fallback in case the Windows/ARM64 runner temporarily drops
+  // out of the runner-images table.
   if (!choices.includes('windows-11-arm')) choices.push('windows-11-arm')
 
   // Now edit the `manual-test` workflow definition
