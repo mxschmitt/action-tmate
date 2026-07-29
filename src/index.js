@@ -5,7 +5,6 @@ import path from "path"
 import * as core from "@actions/core"
 import * as github from "@actions/github"
 import * as tc from "@actions/tool-cache"
-import { Octokit } from "@octokit/rest"
 
 import { execShellCommand, getValidatedInput, getLinuxDistro, useSudoPrefix } from "./helpers"
 
@@ -138,9 +137,9 @@ export async function run() {
     if (limitAccessToActor === "true" || limitAccessToActor === "auto") {
       const { actor, apiUrl } = github.context
       const auth = core.getInput('github-token')
-      const octokit = new Octokit({ auth, baseUrl: apiUrl, request: { fetch }});
+      const octokit = github.getOctokit(auth, { baseUrl: apiUrl, request: { fetch } });
 
-      const keys = await octokit.users.listPublicKeysForUser({
+      const keys = await octokit.rest.users.listPublicKeysForUser({
         username: actor
       })
       if (keys.data.length === 0) {

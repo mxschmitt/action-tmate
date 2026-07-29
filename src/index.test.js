@@ -1,10 +1,23 @@
-jest.mock('@actions/core');
+jest.mock('@actions/core', () => ({
+  getState: jest.fn(),
+  error: jest.fn(),
+  debug: jest.fn(),
+  getInput: jest.fn(),
+  info: jest.fn(),
+  warning: jest.fn(),
+  saveState: jest.fn(),
+  setOutput: jest.fn(),
+  setFailed: jest.fn(),
+}), { virtual: true });
 import * as core from "@actions/core"
-jest.mock('@actions/github');
+jest.mock('@actions/github', () => ({
+  context: {},
+  getOctokit: jest.fn(),
+}), { virtual: true });
 jest.mock("@actions/tool-cache", () => ({
   downloadTool: async () => "",
   extractTar: async () => ""
-}));
+}), { virtual: true });
 jest.mock("fs", () => ({
   mkdirSync: () => true,
   existsSync: () => true,
