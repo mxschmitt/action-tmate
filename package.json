@@ -8,7 +8,8 @@
     "start": "node src/index.js",
     "build": "ncc build src/main.js -o lib",
     "update-detached-action.yml": "sed '/^runs:$/{N;N;N;s/lib\\//..\\/&/g;};/^  detached:/{N;N;N;s/\\(default: .\\)false/\\1true/g;}' action.yml >detached/action.yml",
-    "test": "GITHUB_EVENT_PATH= jest"
+    "test": "GITHUB_EVENT_PATH= jest",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -30,8 +31,11 @@
   "devDependencies": {
     "@babel/core": "^7.29.7",
     "@babel/preset-env": "^7.29.7",
+    "@eslint/js": "^9.39.5",
     "@vercel/ncc": "^0.44.1",
     "babel-jest": "^29.7.0",
+    "eslint": "^9.39.5",
+    "globals": "^17.13.0",
     "jest": "^29.7.0",
     "jest-circus": "^29.7.0"
   }

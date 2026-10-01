@@ -1,0 +1,42 @@
+name: TICS
+on:
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tics:
+    name: TICS
+    if: github.ref == 'refs/heads/main'
+    runs-on: self-hosted-linux-amd64-noble-tiobe
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: Run unit tests with coverage
+        env:
+          GITHUB_EVENT_PATH: ""
+        run: |
+          npx jest --coverageReporters=cobertura --coverageDirectory=.coverage
+          mv .coverage/cobertura-coverage.xml .coverage/cobertura.xml
+      - name: TICS GitHub Action
+        uses: tiobe/tics-github-action@v3
+        with:
+          mode: qserver
+          project: action-tmate
+          branchdir: ${{ github.workspace }}
+          viewerUrl: https://canonical.tiobe.com/tiobeweb/TICS/api/cfg?name=default
+          ticsAuthToken: ${{ secrets.TICSAUTHTOKEN }}
+          installTics: true
+
+concurrency:
+  group: tics
+  cancel-in-progress: false
